@@ -23,6 +23,17 @@ class Cliente(Persona):
         for cliente in cls.lista_clientes:
             print(cliente)
 
+    @property
+    def descuento(self):
+        return self._descuento
+
+    @descuento.setter
+    def descuento(self, descuento):
+        if 0 < descuento <= 1:
+            self._descuento = descuento
+        else:
+            print('ERROR! El valor debe estar expresado en decimales (Ej: 0.1 para 10%)')
+
 
 if __name__ == '__main__':
     cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
