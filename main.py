@@ -1,5 +1,22 @@
+from modelo.Cliente import Cliente
+from modelo.Pedido import Pedido
+from modelo.Producto import Producto
+from modelo.Vendedor import Vendedor
+
+
 def test():
-    print('Hola grupo! ')
+    producto1: Producto = Producto(1, 'Botella Coca Cola 2 Lts', 350, 50)
+    producto2: Producto = Producto(2, 'Botella Pepsi 2 Lts', 300, 50)
+
+    cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
+    cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
+
+    vendedor1: Vendedor = Vendedor('Lucas', 'Francia 231', 1, 0, 0.10)
+
+    pedido1: Pedido = Pedido(vendedor1, cliente1)
+    pedido1.agregar_producto(producto1, 2)
+    pedido1.agregar_producto(producto1, 4)
+    pedido1.agregar_producto(producto2, 10)
 
 
 def main():
@@ -24,6 +41,7 @@ def main():
             print("La opción elegida no es válida")
             pausar()
 
+
 def mostrar_menu():
     print("Menú principal @ Sistema de ventas")
     print("")
@@ -35,6 +53,7 @@ def mostrar_menu():
     print("9 -> Salir")
     print("Seleccione una opción: ")
 
+
 def ingresar_int():
     while True:
         try:
@@ -42,30 +61,40 @@ def ingresar_int():
         except ValueError:
             print("Entrada inválida. Intente nuevamente.")
 
+
 def listar_productos():
-    # Lógica para listar productos
-    pass
+    Producto.listar_productos()
+
 
 def listar_vendedores():
-    # Lógica para listar vendedores
-    pass
+    Vendedor.listar_vendedores()
+
 
 def agregar_productos():
-    # Lógica para agregar productos
-    pass
+    print("Ingresar código de Producto: ", end="")
+    codigo = ingresar_int()
+    descripcion = input("Ingrese descripción: ")
+    print("Ingresar precio de Producto: ", end="")
+    precio = ingresar_int()
+    print("Ingresar stock inicial: ", end="")
+    stock = ingresar_int()
+    Producto(codigo, descripcion, precio, stock)
+
 
 def agregar_vendedores():
     # Lógica para agregar vendedores
     pass
 
+
 def generar_venta():
     # Lógica para generar una venta
     pass
+
 
 def pausar():
     input("Presione Enter para continuar...")
 
 
 if __name__ == '__main__':
-    main()
     test()
+    main()
