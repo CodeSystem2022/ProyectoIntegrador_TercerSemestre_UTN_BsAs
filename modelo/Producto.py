@@ -2,7 +2,7 @@ class Producto:
     # Almacenamos objetos tipo Producto en una lista
     lista_productos = []
 
-    def __init__(self, codigo, descripcion, precio, stock):
+    def __init__(self, descripcion, precio, stock, codigo=0):
         self._codigo = codigo
         self._descripcion = descripcion
         self._precio = precio
