@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>310</x>
-      <y>40</y>
+      <x>250</x>
+      <y>20</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -23,7 +23,7 @@
     </coordinates>
     <panel_attributes>Producto
 --
--Codigo: int
+-Id: int
 -Descripcion: String
 -Precio: float
 -Stock: int</panel_attributes>
@@ -32,14 +32,14 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>550</x>
-      <y>260</y>
-      <w>210</w>
-      <h>130</h>
+      <x>680</x>
+      <y>210</y>
+      <w>220</w>
+      <h>160</h>
     </coordinates>
     <panel_attributes>Vendedor
 --
--Codigo: int
+-Id: int
 -Comision: float
 -PorcentualComision: float
 --
@@ -53,26 +53,26 @@ Responsabilities
     <id>Relation</id>
     <coordinates>
       <x>140</x>
-      <y>60</y>
-      <w>210</w>
-      <h>150</h>
+      <y>40</y>
+      <w>150</w>
+      <h>170</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>190.0;10.0;10.0;130.0</additional_attributes>
+    <additional_attributes>130.0;10.0;10.0;150.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>310</x>
-      <y>240</y>
+      <x>350</x>
+      <y>220</y>
       <w>210</w>
-      <h>100</h>
+      <h>140</h>
     </coordinates>
     <panel_attributes>Cliente
 --
--Contador: int
--Descuento: float
-</panel_attributes>
+-Id: int
+-Email: String
+-Descuento: float</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -81,37 +81,39 @@ Responsabilities
       <x>530</x>
       <y>50</y>
       <w>210</w>
-      <h>100</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>Persona
 --
 -Nombre: String
+-Persona: String
+-Dni: String
 -Domicilio: String</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>390</x>
-      <y>140</y>
-      <w>190</w>
-      <h>120</h>
+      <x>430</x>
+      <y>160</y>
+      <w>150</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>lt=.&gt;
 &lt;&lt;extends&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;100.0;170.0;10.0</additional_attributes>
+    <additional_attributes>10.0;60.0;130.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>640</x>
-      <y>140</y>
-      <w>100</w>
-      <h>140</h>
+      <y>160</y>
+      <w>170</w>
+      <h>70</h>
     </coordinates>
     <panel_attributes>lt=.&gt;
 &lt;&lt;extends&gt;&gt;</panel_attributes>
-    <additional_attributes>20.0;120.0;10.0;10.0</additional_attributes>
+    <additional_attributes>150.0;50.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
@@ -119,54 +121,28 @@ Responsabilities
       <x>170</x>
       <y>490</y>
       <w>210</w>
-      <h>100</h>
+      <h>150</h>
     </coordinates>
     <panel_attributes>Pedido
 --
--Codigo: int
+-Id: int
+-Cliente: Cliente
 -ListaProductos: &lt;list&gt; Producto
 -Vendedor: Vendedor
--Cliente: Cliente</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>800</x>
-      <y>220</y>
-      <w>210</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>Gerente
---
--Codigo: int
---
-Responsabilities
---Dar de alta nuevos vendedores</panel_attributes>
+-ImporteTotal: Float
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>650</x>
-      <y>140</y>
-      <w>270</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes>lt=.&gt;
-&lt;&lt;extends&gt;&gt;</panel_attributes>
-    <additional_attributes>250.0;80.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>350</x>
-      <y>60</y>
-      <w>200</w>
-      <h>70</h>
+      <x>290</x>
+      <y>40</y>
+      <w>260</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;180.0;50.0</additional_attributes>
+    <additional_attributes>10.0;10.0;240.0;30.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -183,22 +159,38 @@ Responsabilities
     <id>Relation</id>
     <coordinates>
       <x>280</x>
-      <y>330</y>
-      <w>130</w>
-      <h>180</h>
+      <y>350</y>
+      <w>170</w>
+      <h>160</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;160.0;110.0;10.0</additional_attributes>
+    <additional_attributes>10.0;140.0;150.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>320</x>
-      <y>380</y>
-      <w>350</w>
-      <h>130</h>
+      <y>360</y>
+      <w>480</w>
+      <h>150</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;110.0;330.0;10.0</additional_attributes>
+    <additional_attributes>10.0;130.0;460.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>800</x>
+      <y>440</y>
+      <w>210</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>Gerente
+--
+-Codigo: int
+--
+Responsabilities
+--Dar de alta nuevos vendedores</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>
