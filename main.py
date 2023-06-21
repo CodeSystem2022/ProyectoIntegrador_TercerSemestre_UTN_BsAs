@@ -1,5 +1,6 @@
 from controller.ProductoController import ProductoController
 from dao.ProductoDao import ProductoDao
+from factory.ConnectionFactory import ConnectionFactory
 from modelo.Cliente import Cliente
 from modelo.Producto import Producto
 from modelo.Vendedor import Vendedor
@@ -90,7 +91,6 @@ def eliminar_producto():
         controlador_producto.eliminar(producto)
 
 
-
 def agregar_productos():
     descripcion = input("Ingrese descripción: ")
     print("Ingresar precio de Producto: ", end="")
@@ -111,13 +111,19 @@ def generar_venta():
     pass
 
 
+def chequearBD():
+    if not ConnectionFactory.chequearDB():
+        return ConnectionFactory.crear_tablas()
+
+
 def pausar():
     input("Presione Enter para continuar...")
 
 
 if __name__ == '__main__':
+    chequearBD()
     controlador_producto = ProductoController()
     controlador_producto.listar()
+
     # test()
     main()
-
