@@ -2,9 +2,10 @@ class Producto:
     # Almacenamos objetos tipo Producto en una lista
     lista_productos = []
 
-    def __init__(self, descripcion, precio, stock, codigo=0):
+    def __init__(self, marca, modelo, precio, stock, codigo=0):
         self._codigo = codigo
-        self._descripcion = descripcion
+        self._marca = marca
+        self._modelo = modelo
         self._precio = precio
         self._stock = stock
         # Agregamos el objeto a la lista de productos
@@ -19,12 +20,20 @@ class Producto:
         self._codigo = codigo
 
     @property
-    def descripcion(self):
-        return self._descripcion
+    def marca(self):
+        return self._marca
 
-    @descripcion.setter
-    def descripcion(self, descripcion):
-        self._descripcion = descripcion
+    @marca.setter
+    def marca(self, marca):
+        self._marca = marca
+
+    @property
+    def modelo(self):
+        return self._modelo
+
+    @modelo.setter
+    def modelo(self, modelo):
+        self._modelo = modelo
 
     @property
     def precio(self):
@@ -45,7 +54,8 @@ class Producto:
     def __str__(self):
         return f'Producto:\n' \
                f'\tCódigo: {self._codigo} \n' \
-               f'\tDescripción: {self._descripcion}\n' \
+               f'\tMarca: {self._marca}\n' \
+               f'\tModelo: {self._modelo}\n' \
                f'\tPrecio: ${self._precio}\n' \
                f'\tStock: {self._stock} unidades\n'
 

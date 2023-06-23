@@ -1,13 +1,13 @@
 from modelo.Cliente import Cliente
 from modelo.Producto import Producto
-from modelo.Vendedor import Vendedor
+from modelo.Usuario import Usuario
 
 
 class Pedido:
     lista_pedidos: list = []
     contador_pedidos: int = 0
 
-    def __init__(self, vendedor: Vendedor, cliente: Cliente):
+    def __init__(self, vendedor: Usuario, cliente: Cliente):
         Pedido.contador_pedidos += 1
         self._codigo = Pedido.contador_pedidos
         self._vendedor = vendedor
@@ -17,7 +17,7 @@ class Pedido:
 
     def agregar_producto(self, producto: Producto, cantidad: int):
         if producto.stock < cantidad:
-            print(f'No hay stock suficiente de {producto.descripcion}')
+            print(f'No hay stock suficiente de {producto.marca}')
             return
 
         # print(self._productos)
@@ -28,7 +28,7 @@ class Pedido:
         else:
             self._productos[producto] += cantidad
         producto.stock -= cantidad
-        print(f'Se agregaron {cantidad} unidades de {producto.descripcion} al pedido No {self._codigo}')
+        print(f'Se agregaron {cantidad} unidades de {producto.marca} al pedido No {self._codigo}')
 
     def confirmar_venta(self):
         total: float = 0
@@ -41,7 +41,7 @@ class Pedido:
     def listar_productos(self):
         print(f'Listando ({len(self._productos)}) productos en Pedido No {self._codigo}...')
         for producto, cantidad in self._productos.items():
-            print(f'{producto.descripcion} x {cantidad}')
+            print(f'{producto.marca} x {cantidad}')
 
     def __str__(self):
         return f'Pedido:\n' \
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
     cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
 
-    vendedor1: Vendedor = Vendedor('Lucas', 'Francia 231', 1, 0, 0.10)
+    vendedor1: Usuario = Usuario('Lucas', 'Francia 231', 1, 0, 0.10)
 
     pedido1: Pedido = Pedido(vendedor1, cliente1)
     pedido1.agregar_producto(producto1, 2)

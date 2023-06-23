@@ -1,12 +1,11 @@
 CREATE TABLE IF NOT EXISTS public.clientes
 (
-    idcliente integer NOT NULL,
-    apellido  "char",
-    nombre    "char",
-    documento integer,
-    "email "  "char",
-    descuento numeric(15, 2),
-    CONSTRAINT clientes_pkey PRIMARY KEY (idcliente)
+    id_cliente INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    apellido   VARCHAR(40)     NOT NULL,
+    nombre     VARCHAR(40)     NOT NULL,
+    documento  INT             NOT NULL UNIQUE,
+    email      VARCHAR(40)     NOT NULL UNIQUE,
+    descuento  NUMERIC(15, 2)
 )
     TABLESPACE pg_default;
 
@@ -15,12 +14,11 @@ ALTER TABLE IF EXISTS public.clientes
 
 CREATE TABLE IF NOT EXISTS public.productos
 (
-    idproducto integer NOT NULL,
-    marca      "char",
-    modelo     "char",
-    precio     numeric(15, 2),
-    stock      numeric(6, 0),
-    CONSTRAINT productos_pkey PRIMARY KEY (idproducto)
+    id_producto INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    marca       VARCHAR(40)     NOT NULL,
+    modelo      VARCHAR(40)     NOT NULL,
+    precio      NUMERIC(15, 2),
+    stock       NUMERIC(6, 0)
 )
     TABLESPACE pg_default;
 
@@ -29,14 +27,12 @@ ALTER TABLE IF EXISTS public.productos
 
 CREATE TABLE IF NOT EXISTS public.usuarios
 (
-    idusuario integer NOT NULL,
-    apellido  "char"  NOT NULL,
-    nombre    "char",
-    documento integer,
-    login     "char"  NOT NULL,
-    clave     "char",
-    comision  double precision,
-    CONSTRAINT usuarios_pkey PRIMARY KEY (idusuario)
+    id_usuario         INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    apellido           VARCHAR(40)     NOT NULL,
+    nombre             VARCHAR(40)     NOT NULL,
+    documento          INT             NOT NULL UNIQUE,
+    porcentualcomision DOUBLE PRECISION,
+    comision           DOUBLE PRECISION
 )
     TABLESPACE pg_default;
 
@@ -45,32 +41,35 @@ ALTER TABLE IF EXISTS public.usuarios
 
 CREATE TABLE IF NOT EXISTS public.ventas
 (
-    idventa     numeric(10, 0) NOT NULL,
-    "fechaAlta" date,
-    idcliente   numeric(10, 0) NOT NULL,
-    idusuario   numeric(10, 0) NOT NULL,
-    importe     numeric(15, 2),
-    comision    numeric(15, 2),
-    descuento   numeric(15, 2),
-    CONSTRAINT ventas_pkey PRIMARY KEY (idventa)
+    id_venta   INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    fecha_alta date,
+    id_cliente INT             NOT NULL,
+    id_usuario INT             NOT NULL,
+    importe    numeric(15, 2),
+    comision   numeric(15, 2),
+    descuento  numeric(15, 2),
+    CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente),
+    CONSTRAINT fk_id_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 )
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.ventas
     OWNER to postgres;
 
-CREATE TABLE IF NOT EXISTS public."ventasItems"
+CREATE TABLE IF NOT EXISTS public.ventas_items
 (
-    "idventaItem"    numeric(10, 0) NOT NULL,
-    idventa          numeric(10, 0) NOT NULL,
-    idproducto       numeric(10, 0) NOT NULL,
-    cantidad         numeric(10, 0),
-    "precioUnitario" numeric(15, 2)
+    id_venta_item   INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    id_venta        INT,
+    id_producto     INT,
+    cantidad        NUMERIC(10, 0),
+    precio_unitario NUMERIC(15, 2),
+    CONSTRAINT fk_id_venta FOREIGN KEY (id_venta) REFERENCES ventas (id_venta),
+    CONSTRAINT fk_id_producto FOREIGN KEY (id_producto) REFERENCES productos (id_producto)
 )
     TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public."ventasItems"
+ALTER TABLE IF EXISTS public.ventas_items
     OWNER to postgres;
 
-COMMENT ON TABLE public."ventasItems"
+COMMENT ON TABLE public.ventas_items
     IS 'Detalle de todos los productos que se incluyen en una venta';

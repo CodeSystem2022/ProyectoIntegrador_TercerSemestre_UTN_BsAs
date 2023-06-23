@@ -1,9 +1,10 @@
 from controller.ProductoController import ProductoController
+from controller.UsuarioController import UsuarioController
 from dao.ProductoDao import ProductoDao
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Cliente import Cliente
 from modelo.Producto import Producto
-from modelo.Vendedor import Vendedor
+from modelo.Usuario import Usuario
 
 
 def test():
@@ -18,7 +19,7 @@ def test():
     cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
     cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
 
-    vendedor1: Vendedor = Vendedor('Lucas', 'Francia 231', 1, 0, 0.10)
+    vendedor1: Usuario = Usuario('Lucas', 'Francia 231', 1, 0, 0.10)
 
     # pedido1: Pedido = Pedido(vendedor1, cliente1)
     # pedido1.agregar_producto(producto1, 2)
@@ -35,11 +36,11 @@ def main():
         if opcion_elegida == 1:
             listar_productos()
         elif opcion_elegida == 2:
-            listar_vendedores()
+            listar_usuarios()
         elif opcion_elegida == 3:
             agregar_productos()
         elif opcion_elegida == 4:
-            agregar_vendedores()
+            agregar_usuario()
         elif opcion_elegida == 5:
             generar_venta()
         elif opcion_elegida == 6:
@@ -56,9 +57,9 @@ def mostrar_menu():
     print("Menú principal @ Sistema de ventas")
     print("")
     print("1 -> Listar productos")
-    print("2 -> Listar vendedores")
+    print("2 -> Listar usuarios")
     print("3 -> Agregar productos")
-    print("4 -> Agregar vendedores")
+    print("4 -> Agregar usuarios")
     print("5 -> Generar venta")
     print("6 -> Eliminar producto")
     print("9 -> Salir")
@@ -77,8 +78,8 @@ def listar_productos():
     controlador_producto.listar()
 
 
-def listar_vendedores():
-    Vendedor.listar_vendedores()
+def listar_usuarios():
+    controlador_usuario.listar()
 
 
 def eliminar_producto():
@@ -92,18 +93,30 @@ def eliminar_producto():
 
 
 def agregar_productos():
-    descripcion = input("Ingrese descripción: ")
-    print("Ingresar precio de Producto: ", end="")
+    marca = input("Ingrese marca del producto: ")
+    modelo = input("Ingrese modelo del producto: ")
+    print("Ingresar precio del producto: ", end="")
     precio = ingresar_int()
     print("Ingresar stock inicial: ", end="")
     stock = ingresar_int()
-    producto = Producto(descripcion, precio, stock)
+    producto = Producto(marca=marca, modelo=modelo, precio=precio, stock=stock)
     controlador_producto.guardar(producto)
 
 
-def agregar_vendedores():
+def agregar_usuario():
     # Lógica para agregar vendedores
-    pass
+    apellido = input("Ingrese apellido del usuario: ")
+    nombre = input("Ingrese nombre del usuario: ")
+    print("Ingresar dni del usuario: ", end="")
+    documento = ingresar_int()
+    porcentualcomision = 1
+    while 0 < porcentualcomision <= 1:
+        porcentualcomision = float(input("Ingrese porcentaje de comisión del usuario: "))
+        usuario = Usuario(apellido=apellido, nombre=nombre, documento=documento, porcentualcomision=porcentualcomision)
+        controlador_usuario.guardar(usuario)
+        return
+    else:
+        print('ERROR! El valor debe estar expresado en decimales (Ej: 0.1 para 10%)')
 
 
 def generar_venta():
@@ -121,9 +134,13 @@ def pausar():
 
 
 if __name__ == '__main__':
+    # Chequea si la base de datos existe
     chequearBD()
+    # Crea conexiones a los controller's de las tablas
     controlador_producto = ProductoController()
-    controlador_producto.listar()
+    controlador_usuario = UsuarioController()
+
+    # controlador_producto.listar()
 
     # test()
     main()
