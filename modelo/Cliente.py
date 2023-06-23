@@ -5,9 +5,10 @@ class Cliente(Persona):
     # Lista para almacenar clientes creados
     lista_clientes: list = []
 
-    def __init__(self, nombre, domicilio, codigo, descuento):
-        super().__init__(nombre, domicilio)
+    def __init__(self, nombre, apellido, documento, email, descuento, codigo=0):
+        super().__init__(nombre, apellido, documento)
         self._codigo = codigo
+        self._email = email
         self._descuento = descuento
         Cliente.lista_clientes.append(self)
 
@@ -15,6 +16,7 @@ class Cliente(Persona):
         return f'Cliente:\n' \
                f'{super().__str__()} \n' \
                f'\tCódigo: {self._codigo} \n ' \
+               f'\tEmail: {self._email} \n ' \
                f'\tDescuento: {self._descuento * 100}%'
 
     @classmethod
