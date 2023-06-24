@@ -1,5 +1,7 @@
+from controller.ClienteController import ClienteController
 from controller.ProductoController import ProductoController
 from controller.UsuarioController import UsuarioController
+from controller.VentaController import VentaController
 from dao.ProductoDao import ProductoDao
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Cliente import Cliente
@@ -28,6 +30,7 @@ def test():
 
 
 def main():
+    # TODO: va en el view
     programa_corriendo = True
     while programa_corriendo:
 
@@ -53,6 +56,7 @@ def main():
             pausar()
 
 
+# TODO: va en el view
 def mostrar_menu():
     print("Menú principal @ Sistema de ventas")
     print("")
@@ -62,10 +66,12 @@ def mostrar_menu():
     print("4 -> Agregar usuarios")
     print("5 -> Generar venta")
     print("6 -> Eliminar producto")
+
     print("9 -> Salir")
     print("Seleccione una opción: ")
 
 
+# TODO: va en el view
 def ingresar_int():
     while True:
         try:
@@ -74,14 +80,17 @@ def ingresar_int():
             print("Entrada inválida. Intente nuevamente.")
 
 
+# TODO: va en el view
 def listar_productos():
     controlador_producto.listar()
 
 
+# TODO: va en el view
 def listar_usuarios():
     controlador_usuario.listar()
 
 
+# TODO: va en el view
 def eliminar_producto():
     print("Ingrese código de producto a eliminar: ", end="")
     codigo: int = ingresar_int()
@@ -92,6 +101,7 @@ def eliminar_producto():
         controlador_producto.eliminar(producto)
 
 
+# TODO: va en el view
 def agregar_productos():
     marca = input("Ingrese marca del producto: ")
     modelo = input("Ingrese modelo del producto: ")
@@ -103,6 +113,7 @@ def agregar_productos():
     controlador_producto.guardar(producto)
 
 
+# TODO: va en el view
 def agregar_usuario():
     # Lógica para agregar vendedores
     apellido = input("Ingrese apellido del usuario: ")
@@ -119,6 +130,7 @@ def agregar_usuario():
         print('ERROR! El valor debe estar expresado en decimales (Ej: 0.1 para 10%)')
 
 
+# TODO: va en el DAO VENTA
 def generar_venta():
     # Lógica para generar una venta
     pass
@@ -139,6 +151,8 @@ if __name__ == '__main__':
     # Crea conexiones a los controller's de las tablas
     controlador_producto = ProductoController()
     controlador_usuario = UsuarioController()
+    controlador_cliente = ClienteController()
+    controlador_ventas = VentaController()
 
     # controlador_producto.listar()
 

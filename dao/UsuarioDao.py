@@ -52,7 +52,7 @@ class UsuarioDao:
         try:
             with self.con as conexion:
                 with conexion.cursor() as cursor:
-                    prepared_statement = 'DELETE FROM usuarios WHERE id = %s'
+                    prepared_statement = 'DELETE FROM usuarios WHERE id_usuario = %s'
                     cursor.execute(prepared_statement, (usuario.codigo,))
                     registros_eliminados = cursor.rowcount
                     print(f'Se eliminó satisfactoriamente {registros_eliminados} registro(s).')

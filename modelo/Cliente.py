@@ -5,6 +5,12 @@ class Cliente(Persona):
     # Lista para almacenar clientes creados
     lista_clientes: list = []
 
+    @classmethod
+    def listar_clientes(cls):
+        print(f'Listando ({len(cls.lista_clientes)}) clientes...')
+        for cliente in cls.lista_clientes:
+            print(cliente)
+
     def __init__(self, nombre, apellido, documento, email, descuento, codigo=0):
         super().__init__(nombre, apellido, documento)
         self._codigo = codigo
@@ -12,18 +18,17 @@ class Cliente(Persona):
         self._descuento = descuento
         Cliente.lista_clientes.append(self)
 
-    def __str__(self):
-        return f'Cliente:\n' \
-               f'{super().__str__()} \n' \
-               f'\tCódigo: {self._codigo} \n ' \
-               f'\tEmail: {self._email} \n ' \
-               f'\tDescuento: {self._descuento * 100}%'
+    @property
+    def codigo(self):
+        return self._codigo
 
-    @classmethod
-    def listar_clientes(cls):
-        print(f'Listando ({len(cls.lista_clientes)}) clientes...')
-        for cliente in cls.lista_clientes:
-            print(cliente)
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, email):
+        self._email = email
 
     @property
     def descuento(self):
@@ -36,9 +41,16 @@ class Cliente(Persona):
         else:
             print('ERROR! El valor debe estar expresado en decimales (Ej: 0.1 para 10%)')
 
+    def __str__(self):
+        return f'Cliente:\n' \
+               f'{super().__str__()} \n' \
+               f'\tCódigo: {self._codigo} \n ' \
+               f'\tEmail: {self._email} \n ' \
+               f'\tDescuento: {self._descuento * 100}%'
+
 
 if __name__ == '__main__':
-    cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
+    cliente1: Cliente = Cliente('Juan', 'Garay', 'Calle Falsa 123', 1, 0.15)
     cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
     # print(cliente1)
     # print(cliente2)
