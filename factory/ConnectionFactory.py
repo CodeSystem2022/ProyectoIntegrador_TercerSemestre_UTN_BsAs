@@ -19,46 +19,42 @@ class ConnectionFactory:
     @staticmethod
     def chequearDB():
         dns = f"dbname='postgres' user={ConnectionFactory.user} password={ConnectionFactory.password} host={ConnectionFactory.host} port={ConnectionFactory.port}"
-        conn = psycopg2.connect(dns)
-        conn.autocommit = True
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1 FROM pg_database WHERE datname='ventas'")
-        exists = cursor.fetchone()
-        if not exists:
-            fd = open('sql/crear_base_de_datos.sql', 'r')
-            sqlFile = fd.read()
-            fd.close()
-            sqlCommands = sqlFile.split(';')
-            for command in sqlCommands:
-                print(command)
-                if command.strip() != '':
-                    cursor.execute(command)
-            conn.commit()
-            conn.close()
-            print("Base de datos creada.")
-            return False
-        else:
-            conn.close()
-            print("Base de datos ya existe.")
-            return True
+        conexion = psycopg2.connect(dns)
+        conexion.autocommit = True
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM pg_database WHERE datname='ventas'")
+            exists = cursor.fetchone()
+            if not exists:
+                with open('sql/crear_base_de_datos.sql', 'r') as fd:
+                    sqlFile = fd.read()
+
+                sqlCommands = sqlFile.split(';')
+                for command in sqlCommands:
+                    # print(command)
+                    if command.strip() != '':
+                        cursor.execute(command)
+                print("Base de datos creada.")
+                conexion.close()
+                return False
+            else:
+                conexion.close()
+                print("Base de datos ya existe.")
+                return True
 
     # Si crea la base de datos, llama a la función para crear las tablas necesarias
     @staticmethod
     def crear_tablas():
-        conn = ConnectionFactory.get_connection('crear_tablas')
-        conn.autocommit = True
-        cursor = conn.cursor()
-        fd = open('sql/crear_tablas.sql', 'r')
-        sqlFile = fd.read()
-        fd.close()
-        sqlCommands = sqlFile.split(';')
-        for command in sqlCommands:
-            print(command)
-            if command.strip() != '':
-                cursor.execute(command)
-        conn.commit()
-        conn.close()
-        print("Tablas creadas.")
+        conexion = ConnectionFactory.get_connection('crear_tablas')
+        conexion.autocommit = True
+        with conexion.cursor() as cursor:
+            with open('sql/crear_tablas.sql', 'r') as fd:
+                sqlFile = fd.read()
+            sqlCommands = sqlFile.split(';')
+            for command in sqlCommands:
+                # print(command)
+                if command.strip() != '':
+                    cursor.execute(command)
+        conexion.close()
 
     # Este método devuelve una conexion creada
     @staticmethod

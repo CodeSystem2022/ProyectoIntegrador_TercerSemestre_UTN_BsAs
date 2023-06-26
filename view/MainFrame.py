@@ -149,7 +149,7 @@ class MainFrame(ctk.CTk):
         super().__init__(*args, **kwargs)
         self.geometry("500x400")
         self.title("Sistema de Ventas - Grupo: UTN Bs As")
-        self.button_1 = ctk.CTkButton(self, text="Abrir Sub Ventana",
+        self.button_1 = ctk.CTkButton(self, text="Gestión de Productos",
                                       command=self.abrir_productos)
         self.button_1.pack(side="top", padx=20, pady=20)
 
