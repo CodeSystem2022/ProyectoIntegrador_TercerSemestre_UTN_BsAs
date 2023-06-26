@@ -43,7 +43,7 @@ class VentaDao:
                                       codigo=registro[0]))
                         for producto in VentaDao.listado_ventas:
                             print(
-                                f'Producto: {producto.codigo} - {producto.marca} - {producto.modelo} - ${producto.precio} - {producto.stock} unidades')
+                                f'Producto: {producto.codigo} - {producto.entryMarca} - {producto.modelo} - ${producto.precio} - {producto.stock} unidades')
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 

@@ -3,11 +3,13 @@ from tkinter import ttk
 import customtkinter as ctk
 
 from controller.ProductoController import ProductoController
+from factory.ConnectionFactory import ConnectionFactory
+
 
 # Fuente
 # https://customtkinter.tomschimansky.com/documentation/windows/toplevel
 
-controlador_producto = ProductoController()
+# controlador_producto = ProductoController()
 
 
 class ProductoFrame(ctk.CTkToplevel):
@@ -86,7 +88,7 @@ class ProductoFrame(ctk.CTkToplevel):
         self.tabla.grid(row=6, column=0, columnspan=2)
 
         # Listar los productos en la tabla
-        productos = controlador_producto.listar()
+        productos = MainFrame.controlador_producto.listar()
         for producto in productos:
             self.tabla.insert("", "end", text=producto.codigo,
                               values=(producto.marca, producto.modelo, producto.precio, producto.stock))
@@ -97,19 +99,20 @@ class ProductoFrame(ctk.CTkToplevel):
         # Evento al hacer doble click en una fila de la tabla
         self.tabla.bind("<Double-1>", self.seleccionar_doble_click)
 
+    ###########################################################
     # Acciones de los botones de la ventana ProductoFrame
-
     # Elimina una fila de la tabla
     def eliminar(self):
-        # Devuelve el indice de la fila seleccionada
-        indice = self.tabla.selection()[0]
-        # Otra forma de obtener el indice de la fila seleccionada
-        print(self.tabla.focus())
-        print("Indice: " + indice)
 
+        # Si no hay nada seleccionado, no hace nada
+        if self.tabla.focus() == "":
+            print("No hay nada seleccionado")
+            return
+        # Si hay una fila seleccionada, la guarda en la variable indice
+        indice = self.tabla.focus()
         # Devuelve el valor de la columna 0 (ID)
-        id = self.tabla.item(indice, "text")
-        print("ID: {0}".format(id))
+        id = str(self.tabla.item(indice, "text"))
+        print("Eliminado el registro con ID: {0}".format(id))
 
         # TODO: ya funciona, se desabilitó para no borrar la base de datos cada vez q lo probamos
         # controlador_producto.eliminar(str(id))
@@ -135,10 +138,15 @@ class ProductoFrame(ctk.CTkToplevel):
 
 
 class MainFrame(ctk.CTk):
+    if not ConnectionFactory.chequearDB():
+        ConnectionFactory.crear_tablas()
+    ctk.set_appearance_mode("light")
+
+    ctk.set_default_color_theme("blue")
+    controlador_producto = ProductoController()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.geometry("500x400")
         self.title("Sistema de Ventas - Grupo: UTN Bs As")
         self.button_1 = ctk.CTkButton(self, text="Abrir Sub Ventana",
@@ -149,7 +157,6 @@ class MainFrame(ctk.CTk):
 
     def abrir_productos(self):
         if self.sub_ventana is None or not self.sub_ventana.winfo_exists():
-
             self.sub_ventana = ProductoFrame(self)  # create window if its None or destroyed
         else:
             self.sub_ventana.focus()  # if window exists focus it

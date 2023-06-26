@@ -2,18 +2,26 @@ from factory.ConnectionFactory import ConnectionFactory
 from modelo.Producto import Producto
 
 
-class ProductoDao:
-    listado_productos: list = []
+# El modelado DAO realiza la logica sobre las acciones de
+# CRUD (Create, Read, Update, Delete) en la base de datos
 
+
+class ProductoDao:
+
+    # Al inicializar la clase, recibe una conexion abierta para esta tabla
     def __init__(self, con: ConnectionFactory):
         self.con = con
 
+    # Recibiendo un número entero como código de Producto,
+    # busca entre los productos de la lista
+    # TODO - Al implementarse la interfaz gráfica hay q borrar este método y realizar la acción con el índice del view
     @staticmethod
     def seleccionar_producto(codigo: int) -> Producto:
         for producto in ProductoDao.listado_productos:
             if producto.codigo == codigo:
                 return producto
 
+    # Inserta un Producto a la base de datos
     def guardar(self, producto: Producto):
         try:
             with self.con as conexion:
@@ -27,32 +35,64 @@ class ProductoDao:
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
-    def listar(self):
-        ProductoDao.listado_productos.clear()
+    # Devuelve una lista de productos, la cual obtiene de la base de datos
+    # Funcional OK
+
+    def listar(self) -> list:
+        # Se crea la lista para almacenar los productos
+        productos: list = []
+
+        # Se crea un bloque try-except para manejar errores
         try:
+            # Se crea un bloque with para manejar la conexión
             with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
                 with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
                     prepared_statement: str = 'SELECT * FROM productos ORDER BY id_producto'
+                    # Se ejecuta la consulta
                     cursor.execute(prepared_statement)
+                    # Se obtienen los registros de la consulta
                     registros = cursor.fetchall()
+
+                    # Se verifica si hay registros
                     if registros:
+                        # Se recorren los registros
                         for registro in registros:
-                            ProductoDao.listado_productos.append(
-                                Producto(marca=registro[1], modelo=registro[2], precio=registro[3], stock=registro[4],
-                                         codigo=registro[0]))
-                        for producto in ProductoDao.listado_productos:
-                            print(
-                                f'Producto: {producto.codigo} - {producto.marca} - {producto.modelo} - ${producto.precio} - {producto.stock} unidades')
+                            # Se crea un objeto Producto con los datos del registro
+                            producto = Producto(marca=registro[1],
+                                                modelo=registro[2],
+                                                precio=registro[3],
+                                                stock=registro[4],
+                                                codigo=registro[0])
+                            # Se agrega el producto a la lista
+                            productos.append(producto)
+
+                # Se retorna la lista de productos
+                return productos
+
+        # Se captura la excepción
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
-    def eliminar(self, producto: Producto):
+    # Elimina un Producto de la base de datos, recibe como parámetro el id del producto desde el view
+    # Funcional OK
+
+    def eliminar(self, id: str):
+        # Se crea un bloque try-except para manejar errores
         try:
+            # Se crea un bloque with para manejar la conexión
             with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
                 with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
                     prepared_statement = 'DELETE FROM productos WHERE id_producto = %s'
-                    cursor.execute(prepared_statement, (producto.codigo,))
+                    # Se ejecuta la consulta, pasando como parámetro el id del producto
+                    cursor.execute(prepared_statement, (id))
+                    # Se obtiene la cantidad de registros eliminados
                     registros_eliminados = cursor.rowcount
+                    # Se imprime la cantidad de registros eliminados
                     print(f'Se eliminó satisfactoriamente {registros_eliminados} registro(s).')
+        # Se captura la excepción
         except Exception as e:
             print(f'Ocurrió un error: {e}')

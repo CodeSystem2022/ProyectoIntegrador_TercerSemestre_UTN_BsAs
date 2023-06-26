@@ -1,7 +1,6 @@
 from controller.ClienteController import ClienteController
 from controller.UsuarioController import UsuarioController
 from controller.VentaController import VentaController
-from factory.ConnectionFactory import ConnectionFactory
 from modelo.Cliente import Cliente
 from modelo.Producto import Producto
 from modelo.Usuario import Usuario
@@ -135,18 +134,13 @@ def generar_venta():
     pass
 
 
-def chequearBD():
-    if not ConnectionFactory.chequearDB():
-        return ConnectionFactory.crear_tablas()
-
-
 def pausar():
     input("Presione Enter para continuar...")
 
 
 if __name__ == '__main__':
     # Chequea si la base de datos existe
-    chequearBD()
+
     # Crea conexiones a los controller's de las tablas
     # controlador_producto = ProductoController()
     controlador_usuario = UsuarioController()
@@ -158,5 +152,5 @@ if __name__ == '__main__':
     # Llama la interfaz gráfica
     app.mainloop()
 
-    # test()
-    # main()
+# test()
+# main()
