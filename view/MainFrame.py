@@ -60,10 +60,10 @@ class ProductoFrame(ctk.CTkToplevel):
         self.entryStock.grid(row=4, column=1)
 
         # Botones para agregar, modificar y eliminar
-        self.botonModificar = ctk.CTkButton(self, text="Modificar", width=130, anchor="w")
-        self.botonModificar.grid(row=5, column=0)
-        self.botonEliminar = ctk.CTkButton(self, text="Eliminar", width=130, anchor="w", command=self.eliminar)
-        self.botonEliminar.grid(row=5, column=1)
+        # self.botonModificar = ctk.CTkButton(self, text="Modificar", width=130, anchor="w")
+        # self.botonModificar.grid(row=5, column=0, sticky='WE', padx=10, pady=10)
+        self.botonEliminar = ctk.CTkButton(self, text="Eliminar", width=600, anchor="w", command=self.eliminar)
+        self.botonEliminar.grid(row=5, column=0, columnspan=2, sticky='WE', padx=10, pady=10)
 
         self.tabla = ttk.Treeview(self,
                                   columns=("Marca", "Modelo", "Precio", "Stock")
