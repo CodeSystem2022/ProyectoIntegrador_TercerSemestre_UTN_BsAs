@@ -1,12 +1,11 @@
 from controller.ClienteController import ClienteController
-from controller.ProductoController import ProductoController
 from controller.UsuarioController import UsuarioController
 from controller.VentaController import VentaController
-from dao.ProductoDao import ProductoDao
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Cliente import Cliente
 from modelo.Producto import Producto
 from modelo.Usuario import Usuario
+from view.MainFrame import app
 
 
 def test():
@@ -80,9 +79,9 @@ def ingresar_int():
             print("Entrada inválida. Intente nuevamente.")
 
 
-# TODO: va en el view
-def listar_productos():
-    controlador_producto.listar()
+# # TODO: va en el view
+# def listar_productos():
+#     controlador_producto.listar()
 
 
 # TODO: va en el view
@@ -90,15 +89,15 @@ def listar_usuarios():
     controlador_usuario.listar()
 
 
-# TODO: va en el view
-def eliminar_producto():
-    print("Ingrese código de producto a eliminar: ", end="")
-    codigo: int = ingresar_int()
-    producto: Producto = ProductoDao.seleccionar_producto(codigo)
-    if producto is None:
-        print("No se encontró el producto")
-    else:
-        controlador_producto.eliminar(producto)
+# # TODO: va en el view
+# def eliminar_producto():
+#     print("Ingrese código de producto a eliminar: ", end="")
+#     codigo: int = ingresar_int()
+#     producto: Producto = ProductoDao.seleccionar_producto(codigo)
+#     if producto is None:
+#         print("No se encontró el producto")
+#     else:
+#         controlador_producto.eliminar(producto)
 
 
 # TODO: va en el view
@@ -149,12 +148,15 @@ if __name__ == '__main__':
     # Chequea si la base de datos existe
     chequearBD()
     # Crea conexiones a los controller's de las tablas
-    controlador_producto = ProductoController()
+    # controlador_producto = ProductoController()
     controlador_usuario = UsuarioController()
     controlador_cliente = ClienteController()
     controlador_ventas = VentaController()
 
     # controlador_producto.listar()
 
+    # Llama la interfaz gráfica
+    app.mainloop()
+
     # test()
-    main()
+    # main()
