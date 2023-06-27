@@ -16,8 +16,8 @@ class ConnectionFactory:
         ConnectionFactory.listado_conexiones.append(self)
         print("Se ha creado una nueva conexión.")
         # Lista de conexiones
-        for conexion in ConnectionFactory.listado_conexiones:
-            print(conexion)
+        # for conexion in ConnectionFactory.listado_conexiones:
+        #     print(conexion)
 
     def __str__(self):
         return f"dbname={self.dbname} user={self.user} password={self.password} host={self.host} port={self.port}"

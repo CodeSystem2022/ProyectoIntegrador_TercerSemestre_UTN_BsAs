@@ -8,18 +8,9 @@ from modelo.Producto import Producto
 
 class ProductoDao:
 
-    # Al inicializar la clase, recibe una conexion abierta para esta tabla
+    # Al inicializar el DAO, se le pasa una conexión
     def __init__(self, con: ConnectionFactory):
         self.con = con
-
-    # Recibiendo un número entero como código de Producto,
-    # busca entre los productos de la lista
-    # TODO - Al implementarse la interfaz gráfica hay q borrar este método y realizar la acción con el índice del view
-    @staticmethod
-    def seleccionar_producto(codigo: int) -> Producto:
-        for producto in ProductoDao.listado_productos:
-            if producto.codigo == codigo:
-                return producto
 
     # Inserta un Producto a la base de datos
     # Funcional OK
@@ -32,7 +23,7 @@ class ProductoDao:
                                    (producto.marca, producto.modelo, producto.precio, producto.stock))
                     registros_insertados = cursor.rowcount
                     print(f'Se ingresó satisfactoriamente {registros_insertados} registro(s).')
-                    print(producto)
+                    # print(producto)
         # except psycopg2.errors.InvalidTextRepresentation as e:
         #     messagebox.showwarning("Error", "Ocurrio un error al intentar guardar el producto\n"
         #                                     " El formato de los datos ingresados no es correcto")

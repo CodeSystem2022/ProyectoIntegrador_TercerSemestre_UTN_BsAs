@@ -58,9 +58,3 @@ class Producto:
                f'\tModelo: {self._modelo}\n' \
                f'\tPrecio: ${self._precio}\n' \
                f'\tStock: {self._stock} unidades\n'
-
-    @classmethod
-    def listar_productos(cls):
-        print(f'Listando ({len(cls.lista_productos)}) productos...')
-        for producto in cls.lista_productos:
-            print(producto)

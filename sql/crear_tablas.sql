@@ -28,8 +28,8 @@ ALTER TABLE IF EXISTS public.productos
 CREATE TABLE IF NOT EXISTS public.usuarios
 (
     id_usuario         INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
-    apellido           VARCHAR(40)     NOT NULL,
     nombre             VARCHAR(40)     NOT NULL,
+    apellido           VARCHAR(40)     NOT NULL,
     documento          INT             NOT NULL UNIQUE,
     porcentualcomision DOUBLE PRECISION,
     comision           DOUBLE PRECISION

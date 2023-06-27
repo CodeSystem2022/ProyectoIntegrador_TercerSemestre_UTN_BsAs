@@ -5,12 +5,6 @@ class Usuario(Persona):
     # Lista para almacenar vendedores creados
     lista_usuarios: list = []
 
-    @classmethod
-    def listar_usuarios(cls):
-        print(f'Listando ({len(cls.lista_usuarios)}) usuarios...')
-        for usuario in cls.lista_usuarios:
-            print(usuario)
-
     def __init__(self, nombre, apellido, documento, porcentualcomision, comision=0, codigo=0):
         super().__init__(nombre, apellido, documento)
         self._codigo = codigo

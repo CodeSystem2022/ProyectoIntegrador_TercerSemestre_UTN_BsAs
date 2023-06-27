@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from modelo.Cliente import Cliente
-from modelo.Producto import Producto
 from modelo.Usuario import Usuario
 
 
@@ -71,7 +70,7 @@ class Venta:
     def descuento(self, descuento):
         self._descuento = descuento
 
-    def agregar_producto(self, producto: Producto, cantidad: int):
+    def agregar_producto(self, producto: Usuario, cantidad: int):
         if producto.stock < cantidad:
             print(f'No hay stock suficiente de {producto.marca}')
             return
@@ -97,7 +96,7 @@ class Venta:
     def listar_productos(self):
         print(f'Listando ({len(self._productos)}) productos en Pedido No {self._codigo}...')
         for producto, cantidad in self._productos.items():
-            print(f'{producto.entryMarca} x {cantidad}')
+            print(f'{producto.entryNombre} x {cantidad}')
 
     def __str__(self):
         return f'Pedido:\n' \

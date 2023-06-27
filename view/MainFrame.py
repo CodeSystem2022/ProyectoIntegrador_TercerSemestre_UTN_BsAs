@@ -3,14 +3,16 @@ from tkinter import ttk, messagebox, simpledialog
 import customtkinter as ctk
 
 from controller.ProductoController import ProductoController
+from controller.UsuarioController import UsuarioController
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Producto import Producto
+from modelo.Usuario import Usuario
 
 
 # Fuente
 # https://customtkinter.tomschimansky.com/documentation/windows/toplevel
 
-
+# Ventana para la gestión de productos
 class ProductoFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -283,9 +285,302 @@ class ProductoFrame(ctk.CTkToplevel):
                 messagebox.showwarning("Error", "El valor de stock debe ser un número entero")
                 self.entryStock.focus()
                 return False
-
         # Si pasó todas las validaciones, devuelve True
         return True
+
+
+############################################################
+class UsuarioFrame(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Dando tamaño a la ventana
+        self.geometry("650x500")
+
+        # Dando título a la ventana
+        self.title("Gestión de usuarios")
+
+        # Widgets para nombre, apellido, documento, porcentualcomision, comision
+        # width: Ancho del widget
+        # anchor: Posición del texto dentro del widget (n, s, e, w, ne, nw, se, sw)
+        # padx: Espacio horizontal entre el texto y el borde del widget
+        # pady: Espacio vertical entre el texto y el borde del widget
+
+        # Label = etiqueta
+        # Entry = campo de texto
+        # Button = botón
+        # Treeview = tabla
+        # Scrollbar = barra de desplazamiento
+
+        self.labelNombre = ctk.CTkLabel(self, text="Nombre: ", width=130, anchor="w", padx=10, pady=10)
+        self.labelNombre.grid(row=1, column=0)
+        self.entryNombre = ctk.CTkEntry(self, width=450)
+        self.entryNombre.grid(row=1, column=1)
+
+        self.labelApellido = ctk.CTkLabel(self, text="Apellido: ", width=130, anchor="w", padx=10, pady=10)
+        self.labelApellido.grid(row=2, column=0)
+        self.entryApellido = ctk.CTkEntry(self, width=450)
+        self.entryApellido.grid(row=2, column=1)
+
+        self.labelDocumento = ctk.CTkLabel(self, text="Documento: ", width=130, anchor="w", padx=10, pady=10)
+        self.labelDocumento.grid(row=3, column=0)
+        self.entryDocumento = ctk.CTkEntry(self, width=450)
+        self.entryDocumento.grid(row=3, column=1)
+
+        self.labelPorcentualComision = ctk.CTkLabel(self, text="Porcentaje de comisión: ", width=130, anchor="w",
+                                                    padx=10, pady=10)
+        self.labelPorcentualComision.grid(row=4, column=0)
+        self.entryPorcentualComision = ctk.CTkEntry(self, width=450)
+        self.entryPorcentualComision.grid(row=4, column=1)
+
+        # Botón para agregar un usuario
+        self.botonAgregar = ctk.CTkButton(self, text="Agregar", width=600, anchor='W', command=self.agregar)
+        self.botonAgregar.grid(row=5, column=0, columnspan=2, sticky='WE', padx=10, pady=10)
+
+        # Tabla para mostrar los usuarios
+        self.tabla = ttk.Treeview(self, columns=("Nombre", "Apellido", "Documento", "Porcentual Comision", "Comision"))
+
+        # heading: Texto de la cabecera de la columna
+        self.tabla.heading("#0", text="ID")
+        self.tabla.heading("Nombre", text="Nombre")
+        self.tabla.heading("Apellido", text="Apellido")
+        self.tabla.heading("Documento", text="Documento")
+        self.tabla.heading("Porcentual Comision", text="Porcentual Comision")
+        self.tabla.heading("Comision", text="Comision")
+
+        # column: Nombre de la columna
+        self.tabla.column("#0", width=50)
+        self.tabla.column("Nombre", width=200)
+        self.tabla.column("Apellido", width=200)
+        self.tabla.column("Documento", width=100, anchor="center")
+        self.tabla.column("Porcentual Comision", width=50, anchor="center")
+        self.tabla.column("Comision", width=50, anchor="center")
+
+        # Generamos un Scrollbar para la tabla
+        self.tabla.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tabla.yview)
+        # Seteamos opciones del scrollbar
+        self.tabla.configure(yscrollcommand=self.tabla.scrollbar.set)
+        # Ubicamos el scrollbar
+        self.tabla.scrollbar.grid(columnspan=2, sticky="NSE")
+
+        # Ubicamos la tabla
+        self.tabla.grid(row=6, column=0, columnspan=2)
+
+        # Botón para eliminar un usuario
+        self.botonEliminar = ctk.CTkButton(self, text="Eliminar", width=600, anchor="w", command=self.eliminar)
+        self.botonEliminar.grid(row=7, column=0, columnspan=2, sticky='WE', padx=10, pady=10)
+
+        # Etiqueta para mostrar mensajes de status
+        self.labelStatus = ctk.CTkLabel(self, text="", width=600, anchor="w", padx=10, pady=10, text_color="red")
+        self.labelStatus.grid(row=8, column=0, columnspan=2)
+
+        # Listar los usuarios en la tabla
+        self.listar_usuarios()
+
+        # Eventos de la tabla
+        # Evento al hacer click en una fila de la tabla
+        # self.tabla.bind("<ButtonRelease-1>", self.seleccionar)
+
+        # Evento al hacer doble click en una fila de la tabla
+        self.tabla.bind("<Double-1>", self.seleccionar_doble_click)
+
+    ###########################################################
+    # Acciones de los botones de la ventana UsuarioFrame
+    # Agregar un usuario
+    def agregar(self):
+        # Valida los campos de texto
+        validacion = self.validar_campos()
+        if validacion:
+            # Obtiene los valores de los campos de texto
+            nombre = self.entryNombre.get()
+            apellido = self.entryApellido.get()
+            documento = self.entryDocumento.get()
+            porcentualcomision = self.entryPorcentualComision.get()
+
+            # Crea un usuario con los valores de los campos de texto
+            usuario = Usuario(nombre=nombre, apellido=apellido, documento=documento,
+                              porcentualcomision=porcentualcomision)
+
+            # Guarda el usuario en la base de datos
+            MainFrame.controlador_usuario.guardar(usuario)
+            # Muestra un mensaje de status
+            self.labelStatus.configure(
+                text="Usuario [{} - {}] agregado correctamente".format(usuario.nombre, usuario.apellido),
+                text_color="green")
+            # Limpia los campos de texto
+            self.entryNombre.delete(0, "end")
+            self.entryApellido.delete(0, "end")
+            self.entryDocumento.delete(0, "end")
+            self.entryPorcentualComision.delete(0, "end")
+
+            # Pone el foco en el campo de texto de marca
+            self.entryNombre.focus()
+
+            # Actualiza la tabla
+            self.listar_usuarios()
+
+    # Listar los productos en la tabla
+    def listar_usuarios(self):
+        # Elimina todos los registros de la tabla
+        self.tabla.delete(*self.tabla.get_children())
+        # Obtiene todos los usuarios de la base de datos
+        usuarios: list = MainFrame.controlador_usuario.listar()
+        # Agrega los usuarios a la tabla
+        for usuario in usuarios:
+            self.tabla.insert("", "end",
+                              text=usuario.codigo,
+                              values=(usuario.nombre, usuario.apellido, usuario.documento, usuario.porcentualcomision,
+                                      usuario.comision))
+
+    # Elimina una fila
+    def eliminar(self):
+        # Si no hay nada seleccionado, no hace nada
+        if self.tabla.focus() == "" or self.tabla.focus() is None:
+            print("No hay nada seleccionado")
+            return
+        # Si hay una fila seleccionada, la guarda en la variable indice
+        indice = self.tabla.focus()
+        # print(indice)
+        # Devuelve el valor de la columna 0 (ID)
+        id_usuario = str(self.tabla.item(indice, "text"))
+        # devuelve el valor de la columna 1 (Nombre)
+        nombre = str(self.tabla.item(indice, "values")[0])
+        # devuelve el valor de la columna 2 (Apellido)
+        apellido = str(self.tabla.item(indice, "values")[1])
+        # devuelve el valor de la columna 3 (Documento)
+        documento = str(self.tabla.item(indice, "values")[2])
+        # devuelve el valor de la columna 4 (PorcentualComision)
+        porcentualcomision = str(self.tabla.item(indice, "values")[3])
+        # devuelve el valor de la columna 5 (Comision)
+        comision = str(self.tabla.item(indice, "values")[4])
+
+        # Elimina el registro de la base de datos y
+        # guarda en resultado la cantidad de registros eliminados
+        resultado = MainFrame.controlador_usuario.eliminar(id_usuario)
+
+        # Si resultado existe, es porque se eliminó el registro
+        # de la base de datos, entonces la borramos de la tabla
+        if resultado:
+            self.tabla.delete(indice)
+            self.labelStatus.configure(text="Usuario Id: {} [{} - {}] eliminado".format(id_usuario, nombre, apellido))
+
+    # Acciones al seleccionar una fila de la tabla
+    # TODO: Borrar ?
+    def seleccionar(self, event):
+        item = self.tabla.identify('item', event.x, event.y)
+        if item:
+            print("Hiciste click simple en: ", self.tabla.item(item, "text"))
+        else:
+            print("1C: No hay nada seleccionado")
+            self.tabla.selection_clear()
+
+    # Modificar al hacer doble click en una fila de la tabla
+    # Funcional OK
+    def seleccionar_doble_click(self, event):
+        # Guarda el nombre de las columnas
+        # columnas = ["Codigo", "Marca", "Modelo", "Precio", "Stock"]
+
+        # Obtiene el indice de la fila seleccionada
+        fila = self.tabla.identify('item', event.x, event.y)
+        # print("Fila Seleccionada:", fila)
+
+        # Obtiene el indice de la columna seleccionada
+        columna = int(self.tabla.identify_column(event.x).replace("#", ""))
+        # print("Columna Seleccionada:", columnas[columna])
+
+        # Si fila y columna son distintos de 0, es porque se seleccionó una celda
+        # Si fila es 0, es porque se seleccionó el encabezado de la tabla
+        # Si columna es 0, es porque se seleccionó el ID
+
+        if fila and columna:  # Si fila y columna son distintos de 0
+            # Obtiene los valores de la fila seleccionada
+            codigo = self.tabla.item(fila, "text")
+            nombre = self.tabla.item(fila, "values")[0]
+            apellido = self.tabla.item(fila, "values")[1]
+            documento = self.tabla.item(fila, "values")[2]
+            porcentualComision = self.tabla.item(fila, "values")[3]
+            comision = self.tabla.item(fila, "values")[4]
+
+            # Si la columna es 0, es porque se seleccionó el ID, no se hace nada
+            # Si la columna es 1, es porque se hizo doble click en la columna nombre
+            if columna == 1:
+                print("columna 1")
+                print("Modificar Nombre")
+                nombre = simpledialog.askstring("Modificar Nombre", "Nombre:", initialvalue=nombre)
+                print(nombre)
+            # Si la columna es 2, es porque se hizo doble click en la columna apellido
+            elif columna == 2:
+                print("Modificar Apellido")
+                apellido = simpledialog.askstring("Modificar Apellido", "Apellido:", initialvalue=apellido)
+            # Si la columna es 3, es porque se hizo doble click en la columna documento
+            elif columna == 3:
+                print("Modificar Documento")
+                documento = simpledialog.askinteger("Modificar Documento", "Documento:", initialvalue=documento)
+            # Si la columna es 4, es porque se hizo doble click en la columna porcentualComision
+            elif columna == 4:
+                porcentualComision = simpledialog.askfloat("Modificar Porcentual Comision", "Porcentual Comision:",
+                                                           initialvalue=porcentualComision)
+            # Si la columna es 5, es porque se hizo doble click en la columna comision, no se hace nada
+
+            # Chequeamos que no haya un valor null
+            # cuando se modifica el usuario y se aprieta cancelar
+            if nombre is None or apellido is None or documento is None or porcentualComision is None:
+                return
+
+            # Crea un usuario con los valores modificados
+            usuario = Usuario(codigo=codigo, nombre=nombre, apellido=apellido, documento=documento,
+                              porcentualcomision=porcentualComision, comision=comision)
+
+            # Actualiza el usuario en la base de datos
+            MainFrame.controlador_usuario.actualizar(usuario)
+
+            # Actualiza la tabla
+            self.listar_usuarios()
+
+    # Valida los campos de texto
+    def validar_campos(self):
+        # Valida que el campo de texto Nombre no esté vacío
+        if self.entryNombre.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un nombre")
+            self.entryNombre.focus()
+            return False
+
+        # Valida que el campo de texto Apellido no esté vacío
+        if self.entryApellido.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un apellido")
+            self.entryApellido.focus()
+            return False
+
+        # Valida que el campo de texto Documento no esté vacío
+        if self.entryDocumento.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un valor para el documento")
+            return False
+        else:
+            # Valida que el valor ingresado en Documento sea un número
+            try:
+                int(self.entryDocumento.get())
+            except ValueError:
+                messagebox.showwarning("Error", "El documento debe ser un entero")
+                self.entryDocumento.focus()
+                return False
+
+        # Valida que el campo de texto Porcentual Comision no esté vacío
+        if self.entryPorcentualComision.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un valor para el porcentual comision")
+            return False
+        else:
+            # Valida que el valor ingresado en Porcentual comision sea un número entero
+            try:
+                float(self.entryPorcentualComision.get())
+            except ValueError:
+                messagebox.showwarning("Error", "El valor de porcentual comision debe ser un número")
+                self.entryPorcentualComision.focus()
+                return False
+        # Si pasó todas las validaciones, devuelve True
+        return True
+
+
+############################################################
 
 
 # Clase principal de la aplicación
@@ -302,6 +597,7 @@ class MainFrame(ctk.CTk):
 
     # Crea el controlador de productos
     controlador_producto = ProductoController()
+    controlador_usuario = UsuarioController()
 
     # Crea ventana principal
     def __init__(self, *args, **kwargs):
@@ -320,8 +616,18 @@ class MainFrame(ctk.CTk):
                                              )
         self.buttonProductos.pack(side="top", padx=20, pady=20)
 
+        # Agrega boton para abrir la ventana de usuarios
+        self.buttonUsuarios = ctk.CTkButton(self,
+                                            text="Gestión de Usuarios",
+                                            command=self.abrir_usuarios
+                                            )
+        self.buttonUsuarios.pack(side="top", padx=20, pady=20)
+
         # Setea la ventana de productos como None para controlar si existe
         self.ventanaProductos = None
+
+        # Setea la ventana de usuarios como None para controlar si existe
+        self.ventanaUsuarios = None
 
     # Abre la ventana de productos
     def abrir_productos(self):
@@ -332,6 +638,15 @@ class MainFrame(ctk.CTk):
         else:
             # Si la ventana existe, la enfoca
             self.ventanaProductos.focus()
+
+    def abrir_usuarios(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaUsuarios is None or not self.ventanaUsuarios.winfo_exists():
+            # Crea la ventana de usuarios
+            self.ventanaUsuarios = UsuarioFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaUsuarios.focus()
 
 
 # Crea la ventana principal
