@@ -1,7 +1,3 @@
-from tkinter import messagebox
-
-import psycopg2.errors
-
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Producto import Producto
 
@@ -37,10 +33,10 @@ class ProductoDao:
                     registros_insertados = cursor.rowcount
                     print(f'Se ingresó satisfactoriamente {registros_insertados} registro(s).')
                     print(producto)
-        except psycopg2.errors.InvalidTextRepresentation as e:
-            messagebox.showwarning("Error", "Ocurrio un error al intentar guardar el producto\n"
-                                            " El formato de los datos ingresados no es correcto")
-            print(f'Ocurrió un error: {e}')
+        # except psycopg2.errors.InvalidTextRepresentation as e:
+        #     messagebox.showwarning("Error", "Ocurrio un error al intentar guardar el producto\n"
+        #                                     " El formato de los datos ingresados no es correcto")
+        #     print(f'Ocurrió un error: {e}')
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 

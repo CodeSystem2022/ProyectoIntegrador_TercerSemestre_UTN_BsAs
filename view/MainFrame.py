@@ -84,12 +84,16 @@ class ProductoFrame(ctk.CTkToplevel):
         # Ubicamos la tabla
         self.tabla.grid(row=6, column=0, columnspan=2)
 
-        # Listar los productos en la tabla
-        self.listar_productos()
-
         # Botón para eliminar un producto
         self.botonEliminar = ctk.CTkButton(self, text="Eliminar", width=600, anchor="w", command=self.eliminar)
         self.botonEliminar.grid(row=7, column=0, columnspan=2, sticky='WE', padx=10, pady=10)
+
+        # Etiqueta para mostrar mensajes de status
+        self.labelStatus = ctk.CTkLabel(self, text="", width=600, anchor="w", padx=10, pady=10, text_color="red")
+        self.labelStatus.grid(row=8, column=0, columnspan=2)
+
+        # Listar los productos en la tabla
+        self.listar_productos()
 
         # Eventos de la tabla
         # Evento al hacer click en una fila de la tabla
@@ -116,7 +120,10 @@ class ProductoFrame(ctk.CTkToplevel):
 
             # Guarda el producto en la base de datos
             MainFrame.controlador_producto.guardar(producto)
-
+            # Muestra un mensaje de status
+            self.labelStatus.configure(
+                text="Producto [{} - {}] agregado correctamente".format(producto.marca, producto.modelo),
+                text_color="green")
             # Limpia los campos de texto
             self.entryMarca.delete(0, "end")
             self.entryModelo.delete(0, "end")
@@ -152,6 +159,15 @@ class ProductoFrame(ctk.CTkToplevel):
         # print(indice)
         # Devuelve el valor de la columna 0 (ID)
         id_producto = str(self.tabla.item(indice, "text"))
+        # devuelve el valor de la columna 1 (Marca)
+        marca = str(self.tabla.item(indice, "values")[0])
+        # devuelve el valor de la columna 2 (Modelo)
+        modelo = str(self.tabla.item(indice, "values")[1])
+        # devuelve el valor de la columna 3 (Precio)
+        precio = str(self.tabla.item(indice, "values")[2])
+        # devuelve el valor de la columna 4 (Stock)
+        stock = str(self.tabla.item(indice, "values")[3])
+
         # print(id_producto)
 
         # Elimina el registro de la base de datos y
@@ -162,6 +178,7 @@ class ProductoFrame(ctk.CTkToplevel):
         # de la base de datos, entonces la borramos de la tabla
         if resultado:
             self.tabla.delete(indice)
+            self.labelStatus.configure(text="Producto Id: {} [{} - {}] eliminado".format(id_producto, marca, modelo))
 
     # Acciones al seleccionar una fila de la tabla
     # TODO: Borrar ?
