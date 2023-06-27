@@ -11,8 +11,13 @@ class ConnectionFactory:
     port = '5432'
 
     # Al inicializar una nueva conexion, la guarda en una lista
+
     def __init__(self):
         ConnectionFactory.listado_conexiones.append(self)
+        print("Se ha creado una nueva conexión.")
+        # Lista de conexiones
+        for conexion in ConnectionFactory.listado_conexiones:
+            print(conexion)
 
     # Chequea si existe la base de datos en la computadora
     # Si existe, no hace nada más, sino, la crea
@@ -38,27 +43,38 @@ class ConnectionFactory:
                 return False
             else:
                 conexion.close()
-                print("Base de datos ya existe.")
+                # print("Base de datos ya existe.")
                 return True
 
     # Si crea la base de datos, llama a la función para crear las tablas necesarias
     @staticmethod
     def crear_tablas():
+        # Crea la conexión
         conexion = ConnectionFactory.get_connection('crear_tablas')
+        # Activa el autocommit
         conexion.autocommit = True
+        # Crea el cursor
         with conexion.cursor() as cursor:
+            # Abre el archivo con los comandos sql
             with open('sql/crear_tablas.sql', 'r') as fd:
+                # Lee el archivo y lo guarda en una variable
                 sqlFile = fd.read()
+
+            # Separa los comandos a ejecutar
             sqlCommands = sqlFile.split(';')
+            # Recorre los comandos
             for command in sqlCommands:
                 # print(command)
+                # Si el comando no está vacío, lo ejecuta
                 if command.strip() != '':
                     cursor.execute(command)
+        # Cierra la conexión
         conexion.close()
 
     # Este método devuelve una conexion creada
     @staticmethod
     def get_connection(desde_donde):
+        # TODO: Borrar print al terminar
         print(f'Creando conexión desde {desde_donde}...')
         dns = f'dbname={ConnectionFactory.dbname} user={ConnectionFactory.user} password={ConnectionFactory.password} host={ConnectionFactory.host} port={ConnectionFactory.port}'
         return psycopg2.connect(dns)

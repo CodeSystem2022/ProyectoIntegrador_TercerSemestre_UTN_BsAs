@@ -9,7 +9,7 @@ from modelo.Producto import Producto
 
 class ProductoController:
     def __init__(self):
-        self.producto_dao = ProductoDao(ConnectionFactory.get_connection('ProductoController'))
+        self.producto_dao = ProductoDao(ConnectionFactory().get_connection('ProductoController'))
 
     def guardar(self, producto: Producto):
         self.producto_dao.guardar(producto)

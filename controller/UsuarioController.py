@@ -5,7 +5,7 @@ from modelo.Usuario import Usuario
 
 class UsuarioController:
     def __init__(self):
-        self.usuario_dao = UsuarioDao(ConnectionFactory.get_connection('UsuarioController'))
+        self.usuario_dao = UsuarioDao(ConnectionFactory().get_connection('UsuarioController'))
 
     def guardar(self, usuario: Usuario):
         self.usuario_dao.guardar(usuario)

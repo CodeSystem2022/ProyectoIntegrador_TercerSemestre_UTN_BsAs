@@ -5,7 +5,7 @@ from modelo.Cliente import Cliente
 
 class ClienteController:
     def __init__(self):
-        self.cliente_dao = ClienteDao(ConnectionFactory.get_connection('ClienteController'))
+        self.cliente_dao = ClienteDao(ConnectionFactory().get_connection('ClienteController'))
 
     def guardar(self, cliente: Cliente):
         self.cliente_dao.guardar(cliente)

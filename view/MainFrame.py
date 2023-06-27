@@ -205,37 +205,44 @@ class ProductoFrame(ctk.CTkToplevel):
         # print("Columna Seleccionada:", columnas[columna])
 
         # Si fila y columna son distintos de 0, es porque se seleccionó una celda
-        if fila and columna:
-            if fila:
-                # Obtiene los valores de la fila seleccionada
-                codigo = self.tabla.item(fila, "text")
-                marca = self.tabla.item(fila, "values")[0]
-                modelo = self.tabla.item(fila, "values")[1]
-                precio = self.tabla.item(fila, "values")[2]
-                stock = self.tabla.item(fila, "values")[3]
+        # Si fila es 0, es porque se seleccionó el encabezado de la tabla
+        # Si columna es 0, es porque se seleccionó el ID
 
-                # Si la columna es 0, es porque se seleccionó el ID, no se hace nada
-                # Si la columna es 1, es porque se hizo doble click en la columna marca
-                if columna == 1:
-                    marca = simpledialog.askstring("Modificar Marca", "Marca:", initialvalue=marca)
-                # Si la columna es 2, es porque se hizo doble click en la columna modelo
-                elif columna == 2:
-                    modelo = simpledialog.askstring("Modificar Modelo", "Modelo:", initialvalue=modelo)
-                # Si la columna es 3, es porque se hizo doble click en la columna precio
-                elif columna == 3:
-                    precio = simpledialog.askfloat("Modificar Precio", "Precio:", initialvalue=precio)
-                # Si la columna es 4, es porque se hizo doble click en la columna stock
-                elif columna == 4:
-                    stock = simpledialog.askinteger("Modificar Stock", "Stock:", initialvalue=stock)
+        if fila and columna:  # Si fila y columna son distintos de 0
+            # Obtiene los valores de la fila seleccionada
+            codigo = self.tabla.item(fila, "text")
+            marca = self.tabla.item(fila, "values")[0]
+            modelo = self.tabla.item(fila, "values")[1]
+            precio = self.tabla.item(fila, "values")[2]
+            stock = self.tabla.item(fila, "values")[3]
 
-                # Crea un producto con los valores modificados o su valor sin modificación
-                producto = Producto(codigo=codigo, marca=marca, modelo=modelo, precio=precio, stock=stock)
+            # Si la columna es 0, es porque se seleccionó el ID, no se hace nada
+            # Si la columna es 1, es porque se hizo doble click en la columna marca
+            if columna == 1:
+                marca = simpledialog.askstring("Modificar Marca", "Marca:", initialvalue=marca)
+            # Si la columna es 2, es porque se hizo doble click en la columna modelo
+            elif columna == 2:
+                modelo = simpledialog.askstring("Modificar Modelo", "Modelo:", initialvalue=modelo)
+            # Si la columna es 3, es porque se hizo doble click en la columna precio
+            elif columna == 3:
+                precio = simpledialog.askfloat("Modificar Precio", "Precio:", initialvalue=precio)
+            # Si la columna es 4, es porque se hizo doble click en la columna stock
+            elif columna == 4:
+                stock = simpledialog.askinteger("Modificar Stock", "Stock:", initialvalue=stock)
 
-                # Actualiza el producto en la base de datos
-                MainFrame.controlador_producto.actualizar(producto)
+            # Chequeamos que no haya un valor null
+            # cuando se modifica el producto y se aprieta cancelar
+            if marca is None or modelo is None or precio is None or stock is None:
+                return
 
-                # Actualiza la tabla
-                self.listar_productos()
+            # Crea un producto con los valores modificados
+            producto = Producto(codigo=codigo, marca=marca, modelo=modelo, precio=precio, stock=stock)
+
+            # Actualiza el producto en la base de datos
+            MainFrame.controlador_producto.actualizar(producto)
+
+            # Actualiza la tabla
+            self.listar_productos()
 
     # Valida los campos de texto
     def validar_campos(self):
@@ -284,8 +291,8 @@ class ProductoFrame(ctk.CTkToplevel):
 # Clase principal de la aplicación
 class MainFrame(ctk.CTk):
     # Crea la base de datos y las tablas si no existen
-    if not ConnectionFactory.chequearDB():
-        ConnectionFactory.crear_tablas()
+    if not ConnectionFactory().chequearDB():
+        ConnectionFactory().crear_tablas()
 
     # Configura la apariencia de la ventana
     ctk.set_appearance_mode("light")

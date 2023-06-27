@@ -5,7 +5,7 @@ from modelo.Venta import Venta
 
 class VentaController:
     def __init__(self):
-        self.venta_dao = VentaDao(ConnectionFactory.get_connection('VentaController'))
+        self.venta_dao = VentaDao(ConnectionFactory().get_connection('VentaController'))
 
     def guardar(self, venta: Venta):
         self.venta_dao.guardar(venta)
