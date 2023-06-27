@@ -2,8 +2,10 @@ from tkinter import ttk, messagebox, simpledialog
 
 import customtkinter as ctk
 
+from controller.ClienteController import ClienteController
 from controller.ProductoController import ProductoController
 from controller.UsuarioController import UsuarioController
+from controller.VentaController import VentaController
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Producto import Producto
 from modelo.Usuario import Usuario
@@ -597,7 +599,15 @@ class MainFrame(ctk.CTk):
 
     # Crea el controlador de productos
     controlador_producto = ProductoController()
+
+    # Crea el controlador de usuarios
     controlador_usuario = UsuarioController()
+
+    # Crea el controlador de clientes
+    controlador_cliente = ClienteController()
+
+    # Crea el controlador de ventas
+    controlador_ventas = VentaController()
 
     # Crea ventana principal
     def __init__(self, *args, **kwargs):

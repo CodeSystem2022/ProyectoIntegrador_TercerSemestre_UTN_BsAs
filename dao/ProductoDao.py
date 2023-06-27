@@ -3,7 +3,7 @@ from modelo.Producto import Producto
 
 
 # El modelado DAO realiza la logica sobre las acciones de
-# CRUD (Create, Read, Update, Delete) en la base de datos
+# # CRUD (Create, Read, Update, Delete) en la base de datos
 
 
 class ProductoDao:
