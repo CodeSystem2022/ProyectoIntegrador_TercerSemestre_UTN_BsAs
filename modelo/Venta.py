@@ -105,25 +105,3 @@ class Venta:
                f'\t{self._usuario}\n' \
                f'\tCliente: {self._cliente}\n' \
                f'\tProductos: {self.listar_productos()}\n'
-
-
-if __name__ == '__main__':
-    producto1: Producto = Producto(1, 'Botella Coca Cola 2 Lts', 350, 50)
-    producto2: Producto = Producto(2, 'Botella Pepsi 2 Lts', 300, 50)
-
-    cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
-    cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
-
-    vendedor1: Usuario = Usuario('Lucas', 'Francia 231', 1, 0, 0.10)
-
-    pedido1: Venta = Venta(vendedor1, cliente1)
-    pedido1.agregar_producto(producto1, 2)
-    pedido1.agregar_producto(producto1, 4)
-    pedido1.agregar_producto(producto2, 10)
-
-    # pedido1.listar_productos()
-    pedido1.confirmar_venta()
-    pedido1.listar_productos()
-    print(producto1)
-    print(producto2)
-    print(vendedor1)

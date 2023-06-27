@@ -54,12 +54,3 @@ class Usuario(Persona):
     # TODO: Falta código para generar ventas, conectando la orden con el producto
     def generar_venta(self):
         pass
-
-
-if __name__ == '__main__':
-    vendedor1: Usuario = Usuario('Lucas', 'Apellido', '33333333', 0.10)
-    print(vendedor1)
-    vendedor1.comisionar_venta(1000)
-    vendedor1.comisionar_venta(500)
-    print(vendedor1)
-    Usuario.listar_usuarios()

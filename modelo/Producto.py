@@ -64,13 +64,3 @@ class Producto:
         print(f'Listando ({len(cls.lista_productos)}) productos...')
         for producto in cls.lista_productos:
             print(producto)
-
-
-if __name__ == '__main__':
-    producto1: Producto = Producto(1, 'Botella Coca Cola 2 Lts', 350, 50)
-    producto2: Producto = Producto(2, 'Botella Pepsi 2 Lts', 300, 50)
-
-    # print(producto1)
-    # print(producto2)
-
-    Producto.listar_productos()

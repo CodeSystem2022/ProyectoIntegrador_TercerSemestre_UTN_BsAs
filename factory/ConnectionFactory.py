@@ -19,6 +19,9 @@ class ConnectionFactory:
         for conexion in ConnectionFactory.listado_conexiones:
             print(conexion)
 
+    def __str__(self):
+        return f"dbname={self.dbname} user={self.user} password={self.password} host={self.host} port={self.port}"
+
     # Chequea si existe la base de datos en la computadora
     # Si existe, no hace nada más, sino, la crea
     @staticmethod

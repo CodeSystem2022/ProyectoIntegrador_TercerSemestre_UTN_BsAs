@@ -47,11 +47,3 @@ class Cliente(Persona):
                f'\tCódigo: {self._codigo} \n ' \
                f'\tEmail: {self._email} \n ' \
                f'\tDescuento: {self._descuento * 100}%'
-
-
-if __name__ == '__main__':
-    cliente1: Cliente = Cliente('Juan', 'Garay', 'Calle Falsa 123', 1, 0.15)
-    cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
-    # print(cliente1)
-    # print(cliente2)
-    Cliente.listar_clientes()
