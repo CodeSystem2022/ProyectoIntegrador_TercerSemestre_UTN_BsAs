@@ -20,6 +20,5 @@ class ProductoController:
     def actualizar(self, producto: Producto):
         self.producto_dao.actualizar(producto)
 
-    def eliminar(self, id: str):
-        print(id)
-        self.producto_dao.eliminar(id)
+    def eliminar(self, id_producto: str):
+        return self.producto_dao.eliminar(id_producto)
