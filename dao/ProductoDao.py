@@ -18,12 +18,14 @@ class ProductoDao:
         try:
             with self.con as conexion:
                 with conexion.cursor() as cursor:
+
                     prepared_statement = 'INSERT INTO productos (marca, modelo, precio, stock) VALUES (%s, %s, %s, %s)'
                     cursor.execute(prepared_statement,
                                    (producto.marca, producto.modelo, producto.precio, producto.stock))
                     registros_insertados = cursor.rowcount
                     print(f'Se ingresó satisfactoriamente {registros_insertados} registro(s).')
                     print(producto)
+
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
@@ -53,6 +55,6 @@ class ProductoDao:
                     prepared_statement = 'DELETE FROM productos WHERE id_producto = %s'
                     cursor.execute(prepared_statement, (producto.codigo,))
                     registros_eliminados = cursor.rowcount
-                    print(f'Se eliminó satisfactoriamente {registros_eliminados} registro(s).')
+                    print(f'Se ha eliminado el producto satisfactoriamente {registros_eliminados} registro(s).')
         except Exception as e:
             print(f'Ocurrió un error: {e}')
