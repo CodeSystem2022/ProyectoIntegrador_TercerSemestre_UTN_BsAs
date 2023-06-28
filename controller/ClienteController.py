@@ -11,10 +11,10 @@ class ClienteController:
         self.cliente_dao.guardar(cliente)
 
     def listar(self):
-        self.cliente_dao.listar()
+        return self.cliente_dao.listar()
 
     def actualizar(self, cliente: Cliente):
         self.cliente_dao.actualizar(cliente)
 
-    def eliminar(self, cliente: Cliente):
-        self.cliente_dao.eliminar(cliente)
+    def eliminar(self, id_cliente: str):
+        return self.cliente_dao.eliminar(id_cliente)

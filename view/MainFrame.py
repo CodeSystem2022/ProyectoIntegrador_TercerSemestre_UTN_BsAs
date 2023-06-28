@@ -7,6 +7,7 @@ from controller.ProductoController import ProductoController
 from controller.UsuarioController import UsuarioController
 from controller.VentaController import VentaController
 from factory.ConnectionFactory import ConnectionFactory
+from modelo.Cliente import Cliente
 from modelo.Producto import Producto
 from modelo.Usuario import Usuario
 
@@ -292,6 +293,310 @@ class ProductoFrame(ctk.CTkToplevel):
 
 
 ############################################################
+class ClienteFrame(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Dando tamaño a la ventana
+        self.geometry("650x500")
+
+        # Dando título a la ventana
+        self.title("Gestión de clientes")
+
+        # Widgets para nombre, apellido, documento, email, descuento
+        # width: Ancho del widget
+        # anchor: Posición del texto dentro del widget (n, s, e, w, ne, nw, se, sw)
+        # padx: Espacio horizontal entre el texto y el borde del widget
+        # pady: Espacio vertical entre el texto y el borde del widget
+
+        # Label = etiqueta
+        # Entry = campo de texto
+        # Button = botón
+        # Treeview = tabla
+        # Scrollbar = barra de desplazamiento
+
+        self.labelNombre = ctk.CTkLabel(self, text="Nombre: ", width=130, anchor="w", padx=10, pady=10)
+        self.labelNombre.grid(row=1, column=0)
+        self.entryNombre = ctk.CTkEntry(self, width=450)
+        self.entryNombre.grid(row=1, column=1)
+
+        self.labelApellido = ctk.CTkLabel(self, text="Apellido: ", width=130, anchor="w", padx=10, pady=10)
+        self.labelApellido.grid(row=2, column=0)
+        self.entryApellido = ctk.CTkEntry(self, width=450)
+        self.entryApellido.grid(row=2, column=1)
+
+        self.labelDocumento = ctk.CTkLabel(self, text="Documento: ", width=130, anchor="w", padx=10, pady=10)
+        self.labelDocumento.grid(row=3, column=0)
+        self.entryDocumento = ctk.CTkEntry(self, width=450)
+        self.entryDocumento.grid(row=3, column=1)
+
+        self.labelEmail = ctk.CTkLabel(self, text="Email: ", width=130, anchor="w",
+                                       padx=10, pady=10)
+        self.labelEmail.grid(row=4, column=0)
+        self.entryEmail = ctk.CTkEntry(self, width=450)
+        self.entryEmail.grid(row=4, column=1)
+
+        self.labelDescuento = ctk.CTkLabel(self, text="Descuento: ", width=130, anchor="w",
+                                           padx=10, pady=10)
+        self.labelDescuento.grid(row=5, column=0)
+        self.entryDescuento = ctk.CTkEntry(self, width=450)
+        self.entryDescuento.grid(row=5, column=1)
+
+        # Botón para agregar un cliente
+        self.botonAgregar = ctk.CTkButton(self, text="Agregar", width=600, anchor='W', command=self.agregar)
+        self.botonAgregar.grid(row=6, column=0, columnspan=2, sticky='WE', padx=10, pady=10)
+
+        # Tabla para mostrar los clientes
+        self.tabla = ttk.Treeview(self, columns=("Nombre", "Apellido", "Documento", "Email", "Descuento"))
+
+        # heading: Texto de la cabecera de la columna
+        self.tabla.heading("#0", text="ID")
+        self.tabla.heading("Nombre", text="Nombre")
+        self.tabla.heading("Apellido", text="Apellido")
+        self.tabla.heading("Documento", text="Documento")
+        self.tabla.heading("Email", text="Email")
+        self.tabla.heading("Descuento", text="Descuento")
+
+        # column: Nombre de la columna
+        self.tabla.column("#0", width=50)
+        self.tabla.column("Nombre", width=150)
+        self.tabla.column("Apellido", width=150)
+        self.tabla.column("Documento", width=100, anchor="center")
+        self.tabla.column("Email", width=150, anchor="center")
+        self.tabla.column("Descuento", width=50, anchor="center")
+
+        # Generamos un Scrollbar para la tabla
+        self.tabla.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tabla.yview)
+        # Seteamos opciones del scrollbar
+        self.tabla.configure(yscrollcommand=self.tabla.scrollbar.set)
+        # Ubicamos el scrollbar
+        self.tabla.scrollbar.grid(columnspan=2, sticky="NSE")
+
+        # Ubicamos la tabla
+        self.tabla.grid(row=7, column=0, columnspan=2)
+
+        # Botón para eliminar un cliente
+        self.botonEliminar = ctk.CTkButton(self, text="Eliminar", width=600, anchor="w", command=self.eliminar)
+        self.botonEliminar.grid(row=8, column=0, columnspan=2, sticky='WE', padx=10, pady=10)
+
+        # Etiqueta para mostrar mensajes de status
+        self.labelStatus = ctk.CTkLabel(self, text="", width=600, anchor="w", padx=10, pady=10, text_color="red")
+        self.labelStatus.grid(row=9, column=0, columnspan=2)
+
+        # Listar los clientes en la tabla
+        self.listar_clientes()
+
+        # Eventos de la tabla
+        # Evento al hacer click en una fila de la tabla
+        # self.tabla.bind("<ButtonRelease-1>", self.seleccionar)
+
+        # Evento al hacer doble click en una fila de la tabla
+        self.tabla.bind("<Double-1>", self.seleccionar_doble_click)
+
+    ###########################################################
+    # Acciones de los botones de la ventana ClienteFrame
+    # Agregar un cliente
+    def agregar(self):
+        # Valida los campos de texto
+        validacion = self.validar_campos()
+        if validacion:
+            # Obtiene los valores de los campos de texto
+            nombre = self.entryNombre.get()
+            apellido = self.entryApellido.get()
+            documento = self.entryDocumento.get()
+            email = self.entryEmail.get()
+            descuento = self.entryDescuento.get()
+
+            # Crea un cliente con los valores de los campos de texto
+            cliente = Cliente(nombre=nombre, apellido=apellido, documento=documento, email=email, descuento=descuento)
+
+            # Guarda el cliente en la base de datos
+            MainFrame.controlador_cliente.guardar(cliente)
+            # Muestra un mensaje de status
+            self.labelStatus.configure(
+                text="Cliente [{} - {}] agregado correctamente".format(cliente.nombre, cliente.apellido),
+                text_color="green")
+            # Limpia los campos de texto
+            self.entryNombre.delete(0, "end")
+            self.entryApellido.delete(0, "end")
+            self.entryDocumento.delete(0, "end")
+            self.entryEmail.delete(0, "end")
+            self.entryDescuento.delete(0, "end")
+
+            # Pone el foco en el campo de texto de nombre
+            self.entryNombre.focus()
+
+            # Actualiza la tabla
+            self.listar_clientes()
+
+    # Listar los clientes en la tabla
+    def listar_clientes(self):
+        # Elimina todos los registros de la tabla
+        self.tabla.delete(*self.tabla.get_children())
+        # Obtiene todos los clientes de la base de datos
+        clientes: list = MainFrame.controlador_cliente.listar()
+        # Agrega los clientes a la tabla
+        for cliente in clientes:
+            self.tabla.insert("", "end",
+                              text=cliente.codigo, values=(
+                    cliente.nombre, cliente.apellido, cliente.documento, cliente.email, cliente.descuento))
+
+    # Elimina una fila
+    def eliminar(self):
+        # Si no hay nada seleccionado, no hace nada
+        if self.tabla.focus() == "" or self.tabla.focus() is None:
+            print("No hay nada seleccionado")
+            return
+        # Si hay una fila seleccionada, la guarda en la variable indice
+        indice = self.tabla.focus()
+        # print(indice)
+        # Devuelve el valor de la columna 0 (ID)
+        id_cliente = str(self.tabla.item(indice, "text"))
+        # devuelve el valor de la columna 1 (Nombre)
+        nombre = str(self.tabla.item(indice, "values")[0])
+        # devuelve el valor de la columna 2 (Apellido)
+        apellido = str(self.tabla.item(indice, "values")[1])
+        # devuelve el valor de la columna 3 (Documento)
+        documento = str(self.tabla.item(indice, "values")[2])
+        # devuelve el valor de la columna 4 (Email)
+        email = str(self.tabla.item(indice, "values")[3])
+        # devuelve el valor de la columna 5 (Descuento)
+        descuento = str(self.tabla.item(indice, "values")[4])
+
+        # Elimina el registro de la base de datos y
+        # guarda en resultado la cantidad de registros eliminados
+        resultado = MainFrame.controlador_cliente.eliminar(id_cliente)
+
+        # Si resultado existe, es porque se eliminó el registro
+        # de la base de datos, entonces la borramos de la tabla
+        if resultado:
+            self.tabla.delete(indice)
+            self.labelStatus.configure(text="Cliente Id: {} [{} - {}] eliminado".format(id_cliente, nombre, apellido))
+
+    # Acciones al seleccionar una fila de la tabla
+    # TODO: Borrar ?
+    def seleccionar(self, event):
+        item = self.tabla.identify('item', event.x, event.y)
+        if item:
+            print("Hiciste click simple en: ", self.tabla.item(item, "text"))
+        else:
+            print("1C: No hay nada seleccionado")
+            self.tabla.selection_clear()
+
+    # Modificar al hacer doble click en una fila de la tabla
+    # Funcional OK
+    def seleccionar_doble_click(self, event):
+        # Guarda el nombre de las columnas
+        # columnas = ["Codigo", "Marca", "Modelo", "Precio", "Stock"]
+
+        # Obtiene el indice de la fila seleccionada
+        fila = self.tabla.identify('item', event.x, event.y)
+        # print("Fila Seleccionada:", fila)
+
+        # Obtiene el indice de la columna seleccionada
+        columna = int(self.tabla.identify_column(event.x).replace("#", ""))
+        # print("Columna Seleccionada:", columnas[columna])
+
+        # Si fila y columna son distintos de 0, es porque se seleccionó una celda
+        # Si fila es 0, es porque se seleccionó el encabezado de la tabla
+        # Si columna es 0, es porque se seleccionó el ID
+
+        if fila and columna:  # Si fila y columna son distintos de 0
+            # Obtiene los valores de la fila seleccionada
+            codigo = self.tabla.item(fila, "text")
+            nombre = self.tabla.item(fila, "values")[0]
+            apellido = self.tabla.item(fila, "values")[1]
+            documento = self.tabla.item(fila, "values")[2]
+            email = self.tabla.item(fila, "values")[3]
+            descuento = self.tabla.item(fila, "values")[4]
+
+            # Si la columna es 0, es porque se seleccionó el ID, no se hace nada
+            # Si la columna es 1, es porque se hizo doble click en la columna nombre
+            if columna == 1:
+                nombre = simpledialog.askstring("Modificar Nombre", "Nombre:", initialvalue=nombre)
+            # Si la columna es 2, es porque se hizo doble click en la columna apellido
+            elif columna == 2:
+                apellido = simpledialog.askstring("Modificar Apellido", "Apellido:", initialvalue=apellido)
+            # Si la columna es 3, es porque se hizo doble click en la columna documento
+            elif columna == 3:
+                documento = simpledialog.askinteger("Modificar Documento", "Documento:", initialvalue=documento)
+            # Si la columna es 4, es porque se hizo doble click en la columna email
+            elif columna == 4:
+                email = simpledialog.askstring("Email", "Email:", initialvalue=email)
+            # Si la columna es 5, es porque se hizo doble click en la columna descuento
+            elif columna == 5:
+                descuento = simpledialog.askfloat("Descuento", "Descuento:", initialvalue=descuento)
+
+            # Chequeamos que no haya un valor null
+            # cuando se modifica el cliente y se aprieta cancelar
+            if nombre is None or apellido is None or documento is None or email is None or descuento is None:
+                return
+
+            # Crea un cliente con los valores modificados
+            cliente = Cliente(codigo=codigo, nombre=nombre, apellido=apellido, documento=documento, email=email,
+                              descuento=descuento)
+
+            # Actualiza el cliente en la base de datos
+            MainFrame.controlador_cliente.actualizar(cliente)
+
+            # Actualiza la tabla
+            self.listar_clientes()
+
+    # Valida los campos de texto
+    def validar_campos(self):
+        # Valida que el campo de texto Nombre no esté vacío
+        if self.entryNombre.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un nombre")
+            self.entryNombre.focus()
+            return False
+
+        # Valida que el campo de texto Apellido no esté vacío
+        if self.entryApellido.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un apellido")
+            self.entryApellido.focus()
+            return False
+
+        # Valida que el campo de texto Documento no esté vacío
+        if self.entryDocumento.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un valor para el documento")
+            self.entryDocumento.focus()
+            return False
+        else:
+            # Valida que el valor ingresado en Documento sea un número
+            try:
+                int(self.entryDocumento.get())
+            except ValueError:
+                messagebox.showwarning("Error", "El documento debe ser un entero")
+                self.entryDocumento.focus()
+                return False
+
+        # Valida que el campo de texto email no esté vacío
+        if self.entryEmail.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un valor para el email")
+            self.entryEmail.focus()
+            return False
+
+        # Valida que el campo de texto descuento no esté vacío
+        if self.entryDescuento.get() == "":
+            messagebox.showwarning("Error", "Debe ingresar un valor para el descuento")
+            self.entryDescuento.focus()
+            return False
+        else:
+            # Valida que el valor ingresado en Descuento sea un número
+            try:
+                float(self.entryDescuento.get())
+            except ValueError:
+                messagebox.showwarning("Error", "El descuento debe ser un número")
+                self.entryDescuento.focus()
+                return False
+
+        # Si pasó todas las validaciones, devuelve True
+        return True
+
+
+############################################################
+
+
 class UsuarioFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -415,13 +720,13 @@ class UsuarioFrame(ctk.CTkToplevel):
             self.entryDocumento.delete(0, "end")
             self.entryPorcentualComision.delete(0, "end")
 
-            # Pone el foco en el campo de texto de marca
+            # Pone el foco en el campo de texto de nombre
             self.entryNombre.focus()
 
             # Actualiza la tabla
             self.listar_usuarios()
 
-    # Listar los productos en la tabla
+    # Listar los usuarios en la tabla
     def listar_usuarios(self):
         # Elimina todos los registros de la tabla
         self.tabla.delete(*self.tabla.get_children())
@@ -585,6 +890,8 @@ class UsuarioFrame(ctk.CTkToplevel):
 ############################################################
 
 
+############################################################
+
 # Clase principal de la aplicación
 class MainFrame(ctk.CTk):
     # Crea la base de datos y las tablas si no existen
@@ -633,11 +940,21 @@ class MainFrame(ctk.CTk):
                                             )
         self.buttonUsuarios.pack(side="top", padx=20, pady=20)
 
+        # Agrega boton para abrir la ventana de clientes
+        self.buttonClientes = ctk.CTkButton(self,
+                                            text="Gestión de Clientes",
+                                            command=self.abrir_clientes
+                                            )
+        self.buttonClientes.pack(side="top", padx=20, pady=20)
+
         # Setea la ventana de productos como None para controlar si existe
         self.ventanaProductos = None
 
         # Setea la ventana de usuarios como None para controlar si existe
         self.ventanaUsuarios = None
+
+        # Setea la ventana de clientes como None para controlar si existe
+        self.ventanaClientes = None
 
     # Abre la ventana de productos
     def abrir_productos(self):
@@ -657,6 +974,15 @@ class MainFrame(ctk.CTk):
         else:
             # Si la ventana existe, la enfoca
             self.ventanaUsuarios.focus()
+
+    def abrir_clientes(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaClientes is None or not self.ventanaClientes.winfo_exists():
+            # Crea la ventana de clientes
+            self.ventanaClientes = ClienteFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaClientes.focus()
 
 
 # Crea la ventana principal
