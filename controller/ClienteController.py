@@ -18,3 +18,6 @@ class ClienteController:
 
     def eliminar(self, id_cliente: str):
         return self.cliente_dao.eliminar(id_cliente)
+
+    def buscar_por_id(self, id_cliente: str):
+        return self.cliente_dao.buscar_por_id(id_cliente)

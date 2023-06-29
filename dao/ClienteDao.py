@@ -66,3 +66,17 @@ class ClienteDao:
                     print(f'Se actualizó satisfactoriamente {registros_actualizados} registro(s).')
         except Exception as e:
             print(f'Ocurrió un error: {e}')
+
+    def buscar_por_id(self, id_cliente):
+        try:
+            with self.con as conexion:
+                with conexion.cursor() as cursor:
+                    prepared_statement = 'SELECT * FROM clientes WHERE id_cliente = %s'
+                    cursor.execute(prepared_statement, (id_cliente,))
+                    registro = cursor.fetchone()
+                    if registro:
+                        cliente = Cliente(nombre=registro[1], apellido=registro[2], documento=registro[3],
+                                          email=registro[4], descuento=registro[5], codigo=registro[0])
+                        return cliente
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')

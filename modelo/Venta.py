@@ -10,8 +10,8 @@ class Venta:
     def __init__(self, usuario: Usuario, cliente: Cliente, codigo=0, importe=0, comision=0, descuento=0):
         self._codigo = codigo
         self._fecha_alta = datetime.now()
-        self._usuario = usuario
-        self._cliente = cliente
+        self._usuario = usuario.codigo
+        self._cliente = cliente.codigo
         self._importe = importe
         self._comision = comision
         self._descuento = descuento

@@ -1,3 +1,5 @@
+import tkinter
+from builtins import int
 from tkinter import ttk, messagebox, simpledialog
 
 import customtkinter as ctk
@@ -15,7 +17,7 @@ from modelo.Usuario import Usuario
 # Fuente
 # https://customtkinter.tomschimansky.com/documentation/windows/toplevel
 
-# Ventana para la gestión de productos
+# Clase para la ventana de gestión de productos
 class ProductoFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -292,7 +294,117 @@ class ProductoFrame(ctk.CTkToplevel):
         return True
 
 
-############################################################
+###############################################################
+
+
+class VentaFrame(ctk.CTkToplevel):
+    # Usuario y cliente para generar la venta
+    usuario: Usuario = None
+    cliente: Cliente = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Dando tamaño a la ventana
+        self.geometry("715x550")
+        # Dando título a la ventana
+        self.title("Gestión de ventas")
+        # Cambiamos el color de la ventana
+        self.config(bg="#b3cde0")
+
+        # Widgets
+        # width: Ancho del widget
+        # anchor: Posición del texto dentro del widget (n, s, e, w, ne, nw, se, sw)
+        # padx: Espacio horizontal entre el texto y el borde del widget
+        # pady: Espacio vertical entre el texto y el borde del widget
+
+        # Label = etiqueta
+        # Entry = campo de texto
+        # Button = botón
+        # Treeview = tabla
+        # Scrollbar = barra de desplazamiento
+
+        # Creamos un frame para los clientes
+        self.frameCliente = ctk.CTkFrame(self, corner_radius=0, border_width=0)
+        # Cambiamos colores del frame
+        self.frameCliente.configure(fg_color="#b3cde0")
+        # Insertamos el frame en la ventana
+        self.frameCliente.grid(row=0, column=0, sticky="we")
+
+        # Creamos un label para el cliente
+        self.labelCliente = ctk.CTkLabel(self.frameCliente, text="Cliente: ", anchor="w", text_color="#011f4b")
+        self.labelCliente.grid(row=0, column=0, sticky="we")
+        # Creamos un listbox para mostrar los clientes
+        self.listaCliente = tkinter.Listbox(self.frameCliente, width=50, height=5)
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarCliente = tkinter.Scrollbar(self.frameCliente, orient="vertical")
+        self.listaCliente.config(yscrollcommand=self.scrollbarCliente.set)
+        self.scrollbarCliente.config(command=self.listaCliente.yview)
+        self.scrollbarCliente.grid(row=1, column=1, sticky="ns")
+
+        # Insertamos los clientes en la lista, contador_cliente es para el indice de la lista
+        contador_cliente = 0
+        for cliente in MainFrame.controlador_cliente.listar():
+            contador_cliente += 1
+            self.listaCliente.insert(contador_cliente,
+                                     '({}) - {} {}'.format(cliente.codigo, cliente.nombre, cliente.apellido))
+
+        # Agregamos un evento para cuando se seleccione un cliente
+        self.listaCliente.bind("<<ListboxSelect>>", self.OnSelectCliente)
+
+        # Insertamos la lista en el frame
+        self.listaCliente.grid(row=1, column=0, sticky="we")
+
+        # Creamos un label para status de cliente
+        self.labelStatusCliente = ctk.CTkLabel(self.frameCliente, text="", anchor="w",
+                                               text_color="#005b96")
+        self.labelStatusCliente.grid(row=2, column=0, sticky="we")
+
+        # Creamos un frame para los usuarios
+        self.frameUsuario = ctk.CTkFrame(self)
+        self.frameUsuario.configure(fg_color="#6497b1")
+
+        self.frameUsuario.grid(row=0, column=1, sticky="we")
+
+        self.labelUsuario = ctk.CTkLabel(self.frameUsuario, text="Usuario: ", anchor="w")
+        self.labelUsuario.grid(row=0, column=0, sticky="we")
+
+        self.listaUsuario = tkinter.Listbox(self.frameUsuario, width=50, height=5)
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarUsuario = tkinter.Scrollbar(self.frameUsuario, orient="vertical")
+        self.listaUsuario.config(yscrollcommand=self.scrollbarUsuario.set)
+        self.scrollbarUsuario.config(command=self.listaUsuario.yview)
+        self.scrollbarUsuario.grid(row=1, column=1, sticky="ns")
+
+        contador_usuario = 0
+        for usuario in MainFrame.controlador_usuario.listar():
+            contador_usuario += 1
+            self.listaUsuario.insert(contador_usuario, usuario.nombre)
+
+        self.listaUsuario.grid(row=1, column=0, sticky="we")
+
+    def OnSelectCliente(self, event):
+        # Chequeamos que haya un elemento seleccionado
+        if len(self.listaCliente.curselection()) == 0:
+            return
+
+        # Obtenemos el índice del elemento seleccionado
+        index = self.listaCliente.curselection()[0]
+        # Obtenemos el texto del elemento seleccionado
+        cliente_elegido = self.listaCliente.get(index)
+        # Separamos el codigo del nombre y apellido
+        codigo_cliente = cliente_elegido.split(")")[0].replace("(", "")
+        # Buscamos el cliente por id, lo guardamos en la variable cliente
+        VentaFrame.cliente = MainFrame.controlador_cliente.buscar_por_id(codigo_cliente)
+        # Insertamos el texto en el label de status
+        texto = "{} {}".format(VentaFrame.cliente.nombre, VentaFrame.cliente.apellido)
+        self.labelStatusCliente.configure(text=texto)
+
+
+#####################################################
+# Clase para la ventana de gestión de clientes
 class ClienteFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -594,9 +706,7 @@ class ClienteFrame(ctk.CTkToplevel):
         return True
 
 
-############################################################
-
-
+# Clase para la ventana de gestión de usuarios
 class UsuarioFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -887,11 +997,6 @@ class UsuarioFrame(ctk.CTkToplevel):
         return True
 
 
-############################################################
-
-
-############################################################
-
 # Clase principal de la aplicación
 class MainFrame(ctk.CTk):
     # Crea la base de datos y las tablas si no existen
@@ -947,6 +1052,13 @@ class MainFrame(ctk.CTk):
                                             )
         self.buttonClientes.pack(side="top", padx=20, pady=20)
 
+        # Agrega boton para abrir la ventana de ventas
+        self.buttonVentas = ctk.CTkButton(self,
+                                          text="Gestión de Ventas",
+                                          command=self.abrir_ventas
+                                          )
+        self.buttonVentas.pack(side="top", padx=20, pady=20)
+
         # Setea la ventana de productos como None para controlar si existe
         self.ventanaProductos = None
 
@@ -955,6 +1067,9 @@ class MainFrame(ctk.CTk):
 
         # Setea la ventana de clientes como None para controlar si existe
         self.ventanaClientes = None
+
+        # Setea la ventana de ventas como None para controlar si existe
+        self.ventanaVentas = None
 
     # Abre la ventana de productos
     def abrir_productos(self):
@@ -983,6 +1098,15 @@ class MainFrame(ctk.CTk):
         else:
             # Si la ventana existe, la enfoca
             self.ventanaClientes.focus()
+
+    def abrir_ventas(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaVentas is None or not self.ventanaVentas.winfo_exists():
+            # Crea la ventana de ventas
+            self.ventanaVentas = VentaFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaVentas.focus()
 
 
 # Crea la ventana principal
