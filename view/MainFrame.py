@@ -21,7 +21,8 @@ from modelo.Usuario import Usuario
 class ProductoFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.focus_set()
+        self.grab_set()
         # Dando tamaño a la ventana
         self.geometry("650x500")
 
@@ -304,14 +305,16 @@ class VentaFrame(ctk.CTkToplevel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.focus_set()
+        self.grab_set()
         # Dando tamaño a la ventana
         self.geometry("715x550")
         # Dando título a la ventana
         self.title("Gestión de ventas")
         # Cambiamos el color de la ventana
         self.config(bg="#b3cde0")
-
+        # Make topLevelWindow remain on top until destroyed, or attribute changes.
+        # self.attributes('-topmost', 'true')
         # Widgets
         # width: Ancho del widget
         # anchor: Posición del texto dentro del widget (n, s, e, w, ne, nw, se, sw)
@@ -408,6 +411,9 @@ class VentaFrame(ctk.CTkToplevel):
 class ClienteFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.focus_set()
+        self.grab_set()
 
         # Dando tamaño a la ventana
         self.geometry("650x500")
@@ -711,6 +717,8 @@ class UsuarioFrame(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.focus_set()
+        self.grab_set()
         # Dando tamaño a la ventana
         self.geometry("650x500")
 
