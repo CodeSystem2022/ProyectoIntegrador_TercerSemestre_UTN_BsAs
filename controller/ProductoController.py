@@ -22,3 +22,6 @@ class ProductoController:
 
     def eliminar(self, id_producto: str):
         return self.producto_dao.eliminar(id_producto)
+
+    def buscar_por_id(self, codigo_producto: str) -> Producto:
+        return self.producto_dao.buscar_por_id(codigo_producto)

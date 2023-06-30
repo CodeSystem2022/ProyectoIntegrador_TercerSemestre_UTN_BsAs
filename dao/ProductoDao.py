@@ -115,3 +115,32 @@ class ProductoDao:
         # Se captura la excepción
         except Exception as e:
             print(f'Ocurrió un error: {e}')
+
+    def buscar_por_id(self, codigo_producto: str):
+        # Se crea un bloque try-except para manejar errores
+        try:
+            # Se crea un bloque with para manejar la conexión
+            with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
+                with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
+                    prepared_statement = 'SELECT * FROM productos WHERE id_producto = %s'
+                    # Se ejecuta la consulta, pasando como parámetro el id del producto
+                    cursor.execute(prepared_statement, (codigo_producto,))
+                    # Se obtiene el registro de la consulta
+                    registro = cursor.fetchone()
+
+                    # Se verifica si hay registros
+                    if registro:
+                        # Se crea un objeto Producto con los datos del registro
+                        producto = Producto(marca=registro[1],
+                                            modelo=registro[2],
+                                            precio=registro[3],
+                                            stock=registro[4],
+                                            codigo=registro[0])
+                        # Se retorna el producto
+                        return producto
+
+        # Se captura la excepción
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')

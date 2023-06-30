@@ -18,3 +18,6 @@ class UsuarioController:
 
     def eliminar(self, id_usuario: str):
         return self.usuario_dao.eliminar(id_usuario)
+
+    def buscar_por_id(self, id_usuario: str):
+        return self.usuario_dao.buscar_por_id(id_usuario)

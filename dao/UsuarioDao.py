@@ -105,3 +105,22 @@ class UsuarioDao:
         # Se captura la excepción
         except Exception as e:
             print(f'Ocurrió un error: {e}')
+
+    def buscar_por_id(self, id_usuario):
+        try:
+            with self.con as conexion:
+                with conexion.cursor() as cursor:
+                    prepared_statement = 'SELECT * FROM usuarios WHERE id_usuario = %s'
+                    cursor.execute(prepared_statement, (id_usuario,))
+                    registro = cursor.fetchone()
+                    if registro:
+                        usuario = Usuario(
+                            nombre=registro[1],
+                            apellido=registro[2],
+                            documento=registro[3],
+                            porcentualcomision=registro[4],
+                            comision=registro[5],
+                            codigo=registro[0])
+                        return usuario
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')

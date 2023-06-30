@@ -302,30 +302,21 @@ class VentaFrame(ctk.CTkToplevel):
     # Usuario y cliente para generar la venta
     usuario: Usuario = None
     cliente: Cliente = None
+    producto: Producto = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Dando focus a la ventana
         self.focus_set()
         self.grab_set()
+
         # Dando tamaño a la ventana
-        self.geometry("715x550")
+        self.geometry("740x550")
         # Dando título a la ventana
         self.title("Gestión de ventas")
         # Cambiamos el color de la ventana
         self.config(bg="#b3cde0")
-        # Make topLevelWindow remain on top until destroyed, or attribute changes.
-        # self.attributes('-topmost', 'true')
-        # Widgets
-        # width: Ancho del widget
-        # anchor: Posición del texto dentro del widget (n, s, e, w, ne, nw, se, sw)
-        # padx: Espacio horizontal entre el texto y el borde del widget
-        # pady: Espacio vertical entre el texto y el borde del widget
-
-        # Label = etiqueta
-        # Entry = campo de texto
-        # Button = botón
-        # Treeview = tabla
-        # Scrollbar = barra de desplazamiento
 
         # Creamos un frame para los clientes
         self.frameCliente = ctk.CTkFrame(self, corner_radius=0, border_width=0)
@@ -335,13 +326,15 @@ class VentaFrame(ctk.CTkToplevel):
         self.frameCliente.grid(row=0, column=0, sticky="we")
 
         # Creamos un label para el cliente
-        self.labelCliente = ctk.CTkLabel(self.frameCliente, text="Cliente: ", anchor="w", text_color="#011f4b")
+        self.labelCliente = ctk.CTkLabel(self.frameCliente, text="  Cliente: ", anchor="w", text_color="#011f4b",
+                                         width=350)
         self.labelCliente.grid(row=0, column=0, sticky="we")
+
         # Creamos un listbox para mostrar los clientes
         self.listaCliente = tkinter.Listbox(self.frameCliente, width=50, height=5)
 
         # Agregamos un scrollbar a la lista
-        self.scrollbarCliente = tkinter.Scrollbar(self.frameCliente, orient="vertical")
+        self.scrollbarCliente = tkinter.Scrollbar(self.frameCliente, orient="vertical", borderwidth=0)
         self.listaCliente.config(yscrollcommand=self.scrollbarCliente.set)
         self.scrollbarCliente.config(command=self.listaCliente.yview)
         self.scrollbarCliente.grid(row=1, column=1, sticky="ns")
@@ -365,45 +358,110 @@ class VentaFrame(ctk.CTkToplevel):
         self.labelStatusCliente.grid(row=2, column=0, sticky="we")
 
         # Creamos un frame para los usuarios
-        self.frameUsuario = ctk.CTkFrame(self)
-        self.frameUsuario.configure(fg_color="#6497b1")
-
+        self.frameUsuario = ctk.CTkFrame(self, corner_radius=0, border_width=0)
+        # Cambiamos colores del frame
+        self.frameUsuario.configure(fg_color="#b3cde0")
+        # Insertamos el frame en la ventana
         self.frameUsuario.grid(row=0, column=1, sticky="we")
 
-        self.labelUsuario = ctk.CTkLabel(self.frameUsuario, text="Usuario: ", anchor="w")
+        # Creamos un label para el usuario
+        self.labelUsuario = ctk.CTkLabel(self.frameUsuario, text="  Usuario: ", anchor="w", text_color="#011f4b",
+                                         width=350)
         self.labelUsuario.grid(row=0, column=0, sticky="we")
 
+        # Creamos un listbox para mostrar los usuarios
         self.listaUsuario = tkinter.Listbox(self.frameUsuario, width=50, height=5)
 
         # Agregamos un scrollbar a la lista
-        self.scrollbarUsuario = tkinter.Scrollbar(self.frameUsuario, orient="vertical")
+        self.scrollbarUsuario = tkinter.Scrollbar(self.frameUsuario, orient="vertical", borderwidth=0)
         self.listaUsuario.config(yscrollcommand=self.scrollbarUsuario.set)
         self.scrollbarUsuario.config(command=self.listaUsuario.yview)
         self.scrollbarUsuario.grid(row=1, column=1, sticky="ns")
 
+        # Insertamos los usuarios en la lista, contador_usuario es para el indice de la lista
         contador_usuario = 0
         for usuario in MainFrame.controlador_usuario.listar():
             contador_usuario += 1
-            self.listaUsuario.insert(contador_usuario, usuario.nombre)
+            self.listaUsuario.insert(contador_usuario,
+                                     '({}) - {} {}'.format(usuario.codigo, usuario.nombre, usuario.apellido))
 
+        # Agregamos un evento para cuando se seleccione un cliente
+        self.listaUsuario.bind("<<ListboxSelect>>", self.OnSelectUsuario)
+
+        # Insertamos la lista en el frame
         self.listaUsuario.grid(row=1, column=0, sticky="we")
 
-    def OnSelectCliente(self, event):
-        # Chequeamos que haya un elemento seleccionado
-        if len(self.listaCliente.curselection()) == 0:
-            return
+        # Creamos un label para status de usuario
+        self.labelStatusUsuario = ctk.CTkLabel(self.frameUsuario, text="", anchor="w",
+                                               text_color="#005b96")
+        self.labelStatusUsuario.grid(row=2, column=0, sticky="we")
 
-        # Obtenemos el índice del elemento seleccionado
-        index = self.listaCliente.curselection()[0]
-        # Obtenemos el texto del elemento seleccionado
-        cliente_elegido = self.listaCliente.get(index)
-        # Separamos el codigo del nombre y apellido
-        codigo_cliente = cliente_elegido.split(")")[0].replace("(", "")
-        # Buscamos el cliente por id, lo guardamos en la variable cliente
-        VentaFrame.cliente = MainFrame.controlador_cliente.buscar_por_id(codigo_cliente)
+        # Colocamos un separador
+        self.separador = ttk.Separator(self, orient="horizontal")
+        self.separador.grid(row=1, column=0, columnspan=3, sticky="ew", padx=10, pady=25)
+
+        # Creamos un menu para los productos
+        self.listaDesplegableProductos = ttk.Combobox(self, state="readonly")
+        self.listaDesplegableProductos["values"] = MainFrame.controlador_producto.listar()
+        self.listaDesplegableProductos.bind("<<ComboboxSelected>>", self.OnSelectProducto)
+        self.listaDesplegableProductos.grid(row=2, column=0, sticky="we")
+
+        self.labelListaProductos = ctk.CTkLabel(self, text="", anchor="center", text_color="#011f4b",
+                                                bg_color="#b3cde0")
+        self.labelListaProductos.grid(row=3, column=0, rowspan=3, sticky="we")
+
+    def OnSelectCliente(self, event):
+        seleccion = self.listaCliente.curselection()
+        if seleccion:
+            VentaFrame.cliente = None
+            # Chequeamos que haya un elemento seleccionado
+            # if (!self.listaCliente.curselection()) or (!self.listaUsuario.curselection()):
+            #     return
+            # Obtenemos el índice del elemento seleccionado
+            index = self.listaCliente.curselection()[0]
+            # Obtenemos el texto del elemento seleccionado
+            cliente_elegido = self.listaCliente.get(index)
+            # Separamos el codigo del nombre y apellido
+            codigo_cliente = cliente_elegido.split(")")[0].replace("(", "")
+            # Buscamos el cliente por id, lo guardamos en la variable cliente
+            VentaFrame.cliente = MainFrame.controlador_cliente.buscar_por_id(codigo_cliente)
+            # Insertamos el texto en el label de status
+            texto = '{} {}'.format(VentaFrame.cliente.nombre, VentaFrame.cliente.apellido)
+            self.labelStatusCliente.configure(text=texto)
+
+    def OnSelectUsuario(self, event):
+        seleccion = self.listaUsuario.curselection()
+        if seleccion:
+            VentaFrame.usuario = None
+            # Chequeamos que haya un elemento seleccionado
+            # if (!self.listaCliente.curselection()) or (!self.listaUsuario.curselection()):
+            #     return
+            # Obtenemos el índice del elemento seleccionado
+            index = self.listaUsuario.curselection()[0]
+            # Obtenemos el texto del elemento seleccionado
+            usuario_elegido = self.listaUsuario.get(index)
+            # Separamos el codigo del nombre y apellido
+            codigo_usuario = usuario_elegido.split(")")[0].replace("(", "")
+            # Buscamos el usuario por id, lo guardamos en la variable cliente
+            VentaFrame.usuario = MainFrame.controlador_usuario.buscar_por_id(codigo_usuario)
+            # Insertamos el texto en el label de status
+            texto = '{} {}'.format(VentaFrame.usuario.nombre, VentaFrame.usuario.apellido)
+            self.labelStatusUsuario.configure(text=texto)
+
+    def OnSelectProducto(self, event):
+        producto_elegido = self.listaDesplegableProductos.get()
+        codigo_producto = producto_elegido.split(" ->")[0]
+        VentaFrame.producto = None
+        # Buscamos el usuario por id, lo guardamos en la variable cliente
+        VentaFrame.producto = MainFrame.controlador_producto.buscar_por_id(codigo_producto)
         # Insertamos el texto en el label de status
-        texto = "{} {}".format(VentaFrame.cliente.nombre, VentaFrame.cliente.apellido)
-        self.labelStatusCliente.configure(text=texto)
+        texto = '''
+        Codigo Producto: {}
+        Marca: {} - Modelo: {}
+        Precio: $ {} - Stock: {}
+        '''.format(VentaFrame.producto.codigo, VentaFrame.producto.marca, VentaFrame.producto.modelo,
+                   VentaFrame.producto.precio, VentaFrame.producto.stock)
+        self.labelListaProductos.configure(text=texto)
 
 
 #####################################################
@@ -719,6 +777,7 @@ class UsuarioFrame(ctk.CTkToplevel):
 
         self.focus_set()
         self.grab_set()
+
         # Dando tamaño a la ventana
         self.geometry("650x500")
 

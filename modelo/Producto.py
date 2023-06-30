@@ -52,9 +52,4 @@ class Producto:
         self._stock = stock
 
     def __str__(self):
-        return f'Producto:\n' \
-               f'\tCódigo: {self._codigo} \n' \
-               f'\tMarca: {self._marca}\n' \
-               f'\tModelo: {self._modelo}\n' \
-               f'\tPrecio: ${self._precio}\n' \
-               f'\tStock: {self._stock} unidades\n'
+        return '{} -> {} {} [ ${} ]'.format(self._codigo, self._marca, self._modelo, self._precio)
