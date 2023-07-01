@@ -1,3 +1,4 @@
+
 from dao.UsuarioDao import UsuarioDao
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Usuario import Usuario
@@ -18,3 +19,9 @@ class UsuarioController:
 
     def eliminar(self, usuario: Usuario):
         self.usuario_dao.eliminar(usuario)
+
+
+
+
+
+
