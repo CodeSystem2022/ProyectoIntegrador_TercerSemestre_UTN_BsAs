@@ -4,6 +4,7 @@ from modelo.Venta import Venta
 
 class VentaDao:
     listado_ventas: list = []
+    ultima_venta: Venta = None
 
     def __init__(self, con: ConnectionFactory):
         self.con = con
@@ -57,3 +58,21 @@ class VentaDao:
                     print(f'Se eliminó satisfactoriamente {registros_eliminados} registro(s).')
         except Exception as e:
             print(f'Ocurrió un error: {e}')
+
+    # Devuelve el último id ingresado
+    def ultimaVenta(self) -> Venta:
+        VentaDao.ultima_venta = None
+        try:
+            with self.con as conexion:
+                with conexion.cursor() as cursor:
+                    prepared_statement: str = 'SELECT max(id_venta) FROM ventas'
+                    cursor.execute(prepared_statement)
+                    registros = cursor.fetchone()
+                    if registros[0]:
+                        print(registros[0])
+                    else:
+                        print("No hay registros de ventas")
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')
+
+        return VentaDao.ultima_venta

@@ -18,3 +18,7 @@ class VentaController:
 
     def eliminar(self, venta: Venta):
         self.venta_dao.eliminar(venta)
+
+    # Devuelve la ultima venta realizada, para obtener el ID
+    def ultima_venta(self):
+        self.venta_dao.ultimaVenta()

@@ -32,7 +32,6 @@ class ClienteDao:
                     registros = cursor.fetchall()
                     if registros:
                         for registro in registros:
-                            print(registro)
                             cliente = Cliente(nombre=registro[1], apellido=registro[2], documento=registro[3],
                                               email=registro[4], descuento=registro[5], codigo=registro[0])
                             clientes.append(cliente)

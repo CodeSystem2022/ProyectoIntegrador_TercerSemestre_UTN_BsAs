@@ -46,7 +46,6 @@ class UsuarioDao:
                         # Se recorren los registros
                         for registro in registros:
                             # Se crea un objeto Usuario con los datos del registro
-                            print(registro)
                             usuario = Usuario(
                                 nombre=registro[1],
                                 apellido=registro[2],

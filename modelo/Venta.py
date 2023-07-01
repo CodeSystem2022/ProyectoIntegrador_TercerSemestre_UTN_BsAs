@@ -10,8 +10,8 @@ class Venta:
     def __init__(self, usuario: Usuario, cliente: Cliente, codigo=0, importe=0, comision=0, descuento=0):
         self._codigo = codigo
         self._fecha_alta = datetime.now()
-        self._usuario = usuario.codigo
-        self._cliente = cliente.codigo
+        self._id_usuario = usuario.codigo
+        self._id_cliente = cliente.codigo
         self._importe = importe
         self._comision = comision
         self._descuento = descuento
@@ -21,6 +21,10 @@ class Venta:
     @property
     def codigo(self):
         return self._codigo
+
+    @codigo.setter
+    def codigo(self, codigo):
+        self._codigo = codigo
 
     @property
     def fecha_alta(self):
@@ -32,19 +36,19 @@ class Venta:
 
     @property
     def usuario(self):
-        return self._usuario
+        return self._id_usuario
 
     @usuario.setter
     def usuario(self, usuario):
-        self._usuario = usuario
+        self._id_usuario = usuario
 
     @property
     def cliente(self):
-        return self._cliente
+        return self._id_cliente
 
     @cliente.setter
     def cliente(self, cliente):
-        self._cliente = cliente
+        self._id_cliente = cliente
 
     @property
     def importe(self):
@@ -89,8 +93,8 @@ class Venta:
         total: float = 0
         for producto, cantidad in self._productos.items():
             total += producto.precio * cantidad
-        total *= (1 - self._cliente.descuento)
-        self._usuario.comisionar_venta(total)
+        total *= (1 - self._id_cliente.descuento)
+        self._id_usuario.comisionar_venta(total)
         print(f'Venta confirmada por ${total}')
 
     def listar_productos(self):
@@ -101,6 +105,6 @@ class Venta:
     def __str__(self):
         return f'Pedido:\n' \
                f'\tCódigo: {self._codigo}\n' \
-               f'\t{self._usuario}\n' \
-               f'\tCliente: {self._cliente}\n' \
+               f'\t{self._id_usuario}\n' \
+               f'\tCliente: {self._id_cliente}\n' \
                f'\tProductos: {self.listar_productos()}\n'
