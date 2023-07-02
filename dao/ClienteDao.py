@@ -2,6 +2,8 @@ from factory.ConnectionFactory import ConnectionFactory
 from modelo.Cliente import Cliente
 
 
+
+
 class ClienteDao:
     listado_clientes: list = []
 
