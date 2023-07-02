@@ -33,7 +33,3 @@ class Persona:
                f'\tApellido: {self._apellido} \n ' \
                f'\tDocumento: {self._documento}'
 
-
-if __name__ == '__main__':
-    persona1 = Persona('Max', 'Chacabuco 222')
-    print(persona1)

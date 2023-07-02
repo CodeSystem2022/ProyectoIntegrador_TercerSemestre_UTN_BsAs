@@ -1,5 +1,7 @@
+
+
 class Producto:
-    # Almacenamos objetos tipo Producto en una lista
+    
     lista_productos = []
 
     def __init__(self, marca, modelo, precio, stock, codigo=0):
@@ -8,10 +10,11 @@ class Producto:
         self._modelo = modelo
         self._precio = precio
         self._stock = stock
-        # Agregamos el objeto a la lista de productos
+       
         Producto.lista_productos.append(self)
 
     @property
+
     def codigo(self):
         return self._codigo
 
@@ -67,10 +70,5 @@ class Producto:
 
 
 if __name__ == '__main__':
-    producto1: Producto = Producto(1, 'Botella Coca Cola 2 Lts', 350, 50)
-    producto2: Producto = Producto(2, 'Botella Pepsi 2 Lts', 300, 50)
-
-    # print(producto1)
-    # print(producto2)
-
+    
     Producto.listar_productos()
