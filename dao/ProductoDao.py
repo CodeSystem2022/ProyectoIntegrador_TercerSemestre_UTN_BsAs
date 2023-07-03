@@ -1,60 +1,157 @@
+from psycopg2 import IntegrityError
+
 from factory.ConnectionFactory import ConnectionFactory
 from modelo.Producto import Producto
 
 
-class ProductoDao:
-    listado_productos: list = []
+# El modelado DAO realiza la logica sobre las acciones de
+# # CRUD (Create, Read, Update, Delete) en la base de datos
 
+
+class ProductoDao:
+
+    # Al inicializar el DAO, se le pasa una conexión
     def __init__(self, con: ConnectionFactory):
         self.con = con
 
-    @staticmethod
-    def seleccionar_producto(codigo: int) -> Producto:
-        for producto in ProductoDao.listado_productos:
-            if producto.codigo == codigo:
-                return producto
-
+    # Inserta un Producto a la base de datos
+    # Funcional OK
     def guardar(self, producto: Producto):
         try:
             with self.con as conexion:
                 with conexion.cursor() as cursor:
-
                     prepared_statement = 'INSERT INTO productos (marca, modelo, precio, stock) VALUES (%s, %s, %s, %s)'
                     cursor.execute(prepared_statement,
                                    (producto.marca, producto.modelo, producto.precio, producto.stock))
                     registros_insertados = cursor.rowcount
                     print(f'Se ingresó satisfactoriamente {registros_insertados} registro(s).')
-                    print(producto)
-
+                    # print(producto)
+        # except psycopg2.errors.InvalidTextRepresentation as e:
+        #     messagebox.showwarning("Error", "Ocurrio un error al intentar guardar el producto\n"
+        #                                     " El formato de los datos ingresados no es correcto")
+        #     print(f'Ocurrió un error: {e}')
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
-    def listar(self):
-        ProductoDao.listado_productos.clear()
+    # Devuelve una lista de productos, la cual obtiene de la base de datos
+    # Funcional OK
+    def listar(self) -> list:
+        # Se crea la lista para almacenar los productos
+        productos: list = []
+
+        # Se crea un bloque try-except para manejar errores
         try:
+            # Se crea un bloque with para manejar la conexión
             with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
                 with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
                     prepared_statement: str = 'SELECT * FROM productos ORDER BY id_producto'
+                    # Se ejecuta la consulta
                     cursor.execute(prepared_statement)
+                    # Se obtienen los registros de la consulta
                     registros = cursor.fetchall()
+
+                    # Se verifica si hay registros
                     if registros:
+                        # Se recorren los registros
                         for registro in registros:
-                            ProductoDao.listado_productos.append(
-                                Producto(marca=registro[1], modelo=registro[2], precio=registro[3], stock=registro[4],
-                                         codigo=registro[0]))
-                        for producto in ProductoDao.listado_productos:
-                            print(
-                                f'Producto: {producto.codigo} - {producto.marca} - {producto.modelo} - ${producto.precio} - {producto.stock} unidades')
+                            # Se crea un objeto Producto con los datos del registro
+                            producto = Producto(marca=registro[1],
+                                                modelo=registro[2],
+                                                precio=registro[3],
+                                                stock=registro[4],
+                                                codigo=registro[0])
+                            # Se agrega el producto a la lista
+                            productos.append(producto)
+
+                # Se retorna la lista de productos
+                return productos
+
+        # Se captura la excepción
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
-    def eliminar(self, producto: Producto):
+    # Elimina un Producto de la base de datos, recibe como parámetro el id del producto desde el view
+    # Funcional OK
+
+    def eliminar(self, id_producto: str):
+        # Se crea un bloque try-except para manejar errores
         try:
+            # Se crea un bloque with para manejar la conexión
             with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
                 with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
                     prepared_statement = 'DELETE FROM productos WHERE id_producto = %s'
-                    cursor.execute(prepared_statement, (producto.codigo,))
+                    # Se ejecuta la consulta, pasando como parámetro el id del producto
+                    cursor.execute(prepared_statement, (id_producto,))
+                    # Se obtiene la cantidad de registros eliminados
                     registros_eliminados = cursor.rowcount
-                    print(f'Se ha eliminado el producto satisfactoriamente {registros_eliminados} registro(s).')
+                    # Se imprime la cantidad de registros eliminados
+                    # print(f'Se eliminó satisfactoriamente {registros_eliminados} registro(s).')
+                    return registros_eliminados
+
+                    # Capturamos la excepcion por foreign key
+        except IntegrityError as e:
+            return e.pgerror
+
+
+        # Se captura la excepción
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')
+
+    # Actualiza un Producto de la base de datos
+    def actualizar(self, producto: Producto):
+        # Se crea un bloque try-except para manejar errores
+        try:
+            # Se crea un bloque with para manejar la conexión
+            with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
+                with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
+                    prepared_statement = 'UPDATE productos SET marca = %s, modelo = %s, precio = %s, stock = %s ' \
+                                         'WHERE id_producto = %s'
+                    # Se ejecuta la consulta, pasando como parámetro los datos del producto
+                    cursor.execute(prepared_statement,
+                                   (producto.marca, producto.modelo, producto.precio, producto.stock,
+                                    producto.codigo))
+                    # Se obtiene la cantidad de registros actualizados
+                    registros_actualizados = cursor.rowcount
+                    return registros_actualizados
+
+
+
+
+        # Se captura la excepción
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')
+
+    def buscar_por_id(self, codigo_producto: str):
+        # Se crea un bloque try-except para manejar errores
+        try:
+            # Se crea un bloque with para manejar la conexión
+            with self.con as conexion:
+                # Se crea un bloque with para manejar el cursor
+                with conexion.cursor() as cursor:
+                    # Se crea un prepared statement con la consulta sql a ejecutar
+                    prepared_statement = 'SELECT * FROM productos WHERE id_producto = %s'
+                    # Se ejecuta la consulta, pasando como parámetro el id del producto
+                    cursor.execute(prepared_statement, (codigo_producto,))
+                    # Se obtiene el registro de la consulta
+                    registro = cursor.fetchone()
+
+                    # Se verifica si hay registros
+                    if registro:
+                        # Se crea un objeto Producto con los datos del registro
+                        producto = Producto(marca=registro[1],
+                                            modelo=registro[2],
+                                            precio=registro[3],
+                                            stock=registro[4],
+                                            codigo=registro[0])
+                        # Se retorna el producto
+                        return producto
+
+        # Se captura la excepción
         except Exception as e:
             print(f'Ocurrió un error: {e}')
