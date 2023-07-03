@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS public.clientes
 (
     id_cliente INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
-    apellido   VARCHAR(40)     NOT NULL,
     nombre     VARCHAR(40)     NOT NULL,
+    apellido   VARCHAR(40)     NOT NULL,
     documento  INT             NOT NULL UNIQUE,
     email      VARCHAR(40)     NOT NULL UNIQUE,
     descuento  NUMERIC(15, 2)
@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS public.productos
     id_producto INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
     marca       VARCHAR(40)     NOT NULL,
     modelo      VARCHAR(40)     NOT NULL,
-    precio      NUMERIC(15, 2),
-    stock       NUMERIC(6, 0)
+    precio      NUMERIC(15, 2)  NOT NULL,
+    stock       NUMERIC(6, 0)   NOT NULL
 )
     TABLESPACE pg_default;
 
@@ -28,8 +28,8 @@ ALTER TABLE IF EXISTS public.productos
 CREATE TABLE IF NOT EXISTS public.usuarios
 (
     id_usuario         INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
-    apellido           VARCHAR(40)     NOT NULL,
     nombre             VARCHAR(40)     NOT NULL,
+    apellido           VARCHAR(40)     NOT NULL,
     documento          INT             NOT NULL UNIQUE,
     porcentualcomision DOUBLE PRECISION,
     comision           DOUBLE PRECISION
