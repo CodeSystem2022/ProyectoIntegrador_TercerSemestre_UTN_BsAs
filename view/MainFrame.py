@@ -1,8 +1,19 @@
+import tkinter
 from tkinter import ttk, messagebox, simpledialog
 
 import customtkinter as ctk
 
+from controller.ClienteController import ClienteController
+from controller.ProductoController import ProductoController
+from controller.UsuarioController import UsuarioController
+from controller.VentaController import VentaController
+from controller.VentaItemController import VentaItemController
+from factory.ConnectionFactory import ConnectionFactory
+from modelo.Cliente import Cliente
 from modelo.Producto import Producto
+from modelo.Usuario import Usuario
+from modelo.Venta import Venta
+from modelo.VentaItem import VentaItem
 
 
 # Fuente
