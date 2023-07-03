@@ -307,3 +307,520 @@ class ProductoFrame(ctk.CTkToplevel):
                 return False
         # Si pasó todas las validaciones, devuelve True
         return True
+
+
+###############################################################
+# Clase para la ventana de gestión de ventas
+class VentaFrame(ctk.CTkToplevel):
+    # Usuario y cliente para generar la venta
+    usuario: Usuario = None
+    cliente: Cliente = None
+    producto: Producto = None
+
+    # TODO: se borra?
+    producto_pedido: Producto = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # TODO: se borra ?
+        # MainFrame.controlador_ventas.id_ultima_venta()
+
+        # Dando focus a la ventana
+        self.focus_set()
+        self.grab_set()
+
+        # Dando tamaño a la ventana
+        self.geometry("740x550")
+        # Dando título a la ventana
+        self.title("Realizar una venta")
+        # Cambiamos el color de la ventana
+        self.config(bg="#b3cde0")
+        self.config(background="#b3cde0")
+
+        # Creamos un frame para los clientes
+        self.frameCliente = ctk.CTkFrame(self, corner_radius=0, border_width=0)
+        # Cambiamos colores del frame
+        self.frameCliente.configure(fg_color="#b3cde0")
+        # Insertamos el frame en la ventana
+        self.frameCliente.grid(row=0, column=0, sticky="we")
+
+        # Creamos un label para el cliente
+        self.labelCliente = ctk.CTkLabel(self.frameCliente, text="  Cliente: ", anchor="w", text_color="#011f4b",
+                                         width=350)
+        self.labelCliente.grid(row=0, column=0, sticky="we")
+
+        # Creamos un listbox para mostrar los clientes
+        self.listaCliente = tkinter.Listbox(self.frameCliente, width=50, height=4)
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarCliente = tkinter.Scrollbar(self.frameCliente, orient="vertical", borderwidth=0)
+        self.listaCliente.config(yscrollcommand=self.scrollbarCliente.set)
+        self.scrollbarCliente.config(command=self.listaCliente.yview)
+        self.scrollbarCliente.grid(sticky="NSE", column=1)
+
+        # Insertamos los clientes en la lista, contador_cliente es para el indice de la lista
+        contador_cliente = 0
+        for cliente in MainFrame.controlador_cliente.listar():
+            contador_cliente += 1
+            self.listaCliente.insert(contador_cliente,
+                                     '({}) - {} {}'.format(cliente.codigo, cliente.nombre, cliente.apellido))
+
+        # Agregamos un evento para cuando se seleccione un cliente
+        self.listaCliente.bind("<<ListboxSelect>>", self.OnSelectCliente)
+
+        # Insertamos la lista en el frame
+        self.listaCliente.grid(row=1, column=0, sticky="we")
+
+        # Creamos un label para status de cliente
+        self.labelStatusCliente = ctk.CTkLabel(self.frameCliente, text="", anchor="center",
+                                               text_color="#005b96")
+        self.labelStatusCliente.grid(row=2, column=0, sticky="ns")
+
+        # Creamos un frame para los usuarios
+        self.frameUsuario = ctk.CTkFrame(self, corner_radius=0, border_width=0)
+        # Cambiamos colores del frame
+        self.frameUsuario.configure(fg_color="#b3cde0")
+        # Insertamos el frame en la ventana
+        self.frameUsuario.grid(row=0, column=1, sticky="we")
+
+        # Creamos un label para el usuario
+        self.labelUsuario = ctk.CTkLabel(self.frameUsuario, text="  Usuario: ", anchor="w", text_color="#011f4b",
+                                         width=350)
+        self.labelUsuario.grid(row=0, column=0, sticky="we")
+
+        # Creamos un listbox para mostrar los usuarios
+        self.listaUsuario = tkinter.Listbox(self.frameUsuario, width=50, height=4)
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarUsuario = tkinter.Scrollbar(self.frameUsuario, orient="vertical")
+        self.listaUsuario.config(yscrollcommand=self.scrollbarUsuario.set)
+        self.scrollbarUsuario.config(command=self.listaUsuario.yview)
+        self.scrollbarUsuario.grid(sticky="NSE", column=1)
+
+        # Insertamos los usuarios en la lista, contador_usuario es para el indice de la lista
+        contador_usuario = 0
+        for usuario in MainFrame.controlador_usuario.listar():
+            contador_usuario += 1
+            self.listaUsuario.insert(contador_usuario,
+                                     '({}) - {} {}'.format(usuario.codigo, usuario.nombre, usuario.apellido))
+
+        # Agregamos un evento para cuando se seleccione un cliente
+        self.listaUsuario.bind("<<ListboxSelect>>", self.OnSelectUsuario)
+
+        # Insertamos la lista en el frame
+        self.listaUsuario.grid(row=1, column=0, sticky="we")
+
+        # Creamos un label para status de usuario
+        self.labelStatusUsuario = ctk.CTkLabel(self.frameUsuario, text="", anchor="center",
+                                               text_color="#005b96")
+        self.labelStatusUsuario.grid(row=2, column=0, sticky="ns")
+
+        # Colocamos un separador
+        self.separador = ttk.Separator(self, orient="horizontal")
+        self.separador.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+
+        # Creamos un menu para los productos
+        self.listaDesplegableProductos = ttk.Combobox(self, state="readonly", width=50)
+
+        # Insertamos los productos en la lista
+        self.listaDesplegableProductos["values"] = MainFrame.controlador_producto.listar()
+        self.listaDesplegableProductos.bind("<<ComboboxSelected>>", self.OnSelectProducto)
+        self.listaDesplegableProductos.grid(row=2, column=0, sticky="ns")
+
+        self.labelListaProductos = ctk.CTkLabel(self, text="\n\n\n", anchor="center", text_color="#011f4b",
+                                                bg_color="#b3cde0")
+        self.labelListaProductos.grid(row=2, column=1, sticky="sn", rowspan=2)
+
+        # Colocamos un boton para agregar productos a la lista
+        self.botonAgregarProductos = ctk.CTkButton(self, text="Agregar producto", command=self.agregarProducto)
+        self.botonAgregarProductos.grid(row=3, column=0)
+
+        # Colocamos un separador
+        self.separador2 = ttk.Separator(self, orient="horizontal")
+        self.separador2.grid(row=4, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+
+        # Tabla para mostrar los productos en la orden de compra
+        self.tablaItemsProductos = ttk.Treeview(self, columns=("Marca", "Modelo", "Precio", "Cantidad", "PrecioFinal"))
+
+        # heading: Texto de la cabecera de la columna
+        self.tablaItemsProductos.heading("#0", text="ID")
+        self.tablaItemsProductos.heading("Marca", text="Marca")
+        self.tablaItemsProductos.heading("Modelo", text="Modelo")
+        self.tablaItemsProductos.heading("Precio", text="Precio Unitario")
+        self.tablaItemsProductos.heading("Cantidad", text="Cantidad")
+        self.tablaItemsProductos.heading("PrecioFinal", text="Precio Final")
+
+        # column: Nombre de la columna
+        self.tablaItemsProductos.column("#0", width=55)
+        self.tablaItemsProductos.column("Marca", width=200)
+        self.tablaItemsProductos.column("Modelo", width=200)
+        self.tablaItemsProductos.column("Precio", width=90, anchor="center")
+        self.tablaItemsProductos.column("Cantidad", width=55, anchor="center")
+        self.tablaItemsProductos.column("PrecioFinal", width=90, anchor="center")
+
+        # Generamos un Scrollbar para la tabla
+        self.tablaItemsProductos.scrollbar = ttk.Scrollbar(self, orient="vertical",
+                                                           command=self.tablaItemsProductos.yview)
+        # Seteamos opciones del scrollbar
+        self.tablaItemsProductos.configure(yscrollcommand=self.tablaItemsProductos.scrollbar.set)
+        # Ubicamos el scrollbar
+        self.tablaItemsProductos.scrollbar.grid(columnspan=2, sticky="NSE", rowspan=2)
+
+        # Ubicamos la tabla
+        self.tablaItemsProductos.grid(row=5, column=0, columnspan=2, pady=5)
+
+        # Colocamos un boton para eliminar productos a la lista
+        self.botonEliminarProductos = ctk.CTkButton(self, text="Eliminar producto", command=self.eliminarProducto)
+        self.botonEliminarProductos.grid(row=7, column=0)
+
+        # Colocamos una label para mostrar el total de la venta
+        self.labelTotalVenta = ctk.CTkLabel(self, text="Monto total: $ 0", anchor="center",
+                                            text_color="#011f4b",
+                                            bg_color="#b3cde0")
+        self.labelTotalVenta.grid(row=7, column=1)
+
+        # Colocamos un separador
+        self.separador3 = ttk.Separator(self, orient="horizontal")
+        self.separador3.grid(row=8, column=0, columnspan=2, sticky="ew", padx=10, pady=15)
+
+        # Colocamos un boton para cancelar la venta
+        self.botonCancelarVenta = ctk.CTkButton(self, text="Cancelar venta", command=self.cancelarVenta)
+        self.botonCancelarVenta.grid(row=9, column=0)
+
+        # Colocamos un boton para finalizar la venta
+        self.botonFinalizarVenta = ctk.CTkButton(self, text="Finalizar venta", command=self.finalizarVenta)
+        self.botonFinalizarVenta.grid(row=9, column=1)
+
+    def OnSelectCliente(self, event):
+        seleccion = self.listaCliente.curselection()
+        if seleccion:
+            VentaFrame.cliente = None
+            # Chequeamos que haya un elemento seleccionado
+            # if (!self.listaCliente.curselection()) or (!self.listaUsuario.curselection()):
+            #     return
+            # Obtenemos el índice del elemento seleccionado
+            index = self.listaCliente.curselection()[0]
+            # Obtenemos el texto del elemento seleccionado
+            cliente_elegido = self.listaCliente.get(index)
+            # Separamos el codigo del nombre y apellido
+            codigo_cliente = cliente_elegido.split(")")[0].replace("(", "")
+            # Buscamos el cliente por id, lo guardamos en la variable cliente
+            VentaFrame.cliente = MainFrame.controlador_cliente.buscar_por_id(codigo_cliente)
+            # Insertamos el texto en el label de status
+            texto = 'Cliente: {} {} - Descuento: %{}'.format(VentaFrame.cliente.nombre, VentaFrame.cliente.apellido,
+                                                             VentaFrame.cliente.descuento)
+            self.labelStatusCliente.configure(text=texto)
+
+    def OnSelectUsuario(self, event):
+        seleccion = self.listaUsuario.curselection()
+        if seleccion:
+            VentaFrame.usuario = None
+            # Chequeamos que haya un elemento seleccionado
+            # if (!self.listaCliente.curselection()) or (!self.listaUsuario.curselection()):
+            #     return
+            # Obtenemos el índice del elemento seleccionado
+            index = self.listaUsuario.curselection()[0]
+            # Obtenemos el texto del elemento seleccionado
+            usuario_elegido = self.listaUsuario.get(index)
+            # Separamos el codigo del nombre y apellido
+            codigo_usuario = usuario_elegido.split(")")[0].replace("(", "")
+            # Buscamos el usuario por id, lo guardamos en la variable cliente
+            VentaFrame.usuario = MainFrame.controlador_usuario.buscar_por_id(codigo_usuario)
+            # Insertamos el texto en el label de status
+            texto = 'Usuario: {} {} - Comisión: %{}'.format(VentaFrame.usuario.nombre, VentaFrame.usuario.apellido,
+                                                            VentaFrame.usuario.porcentualcomision)
+            self.labelStatusUsuario.configure(text=texto)
+
+    def OnSelectProducto(self, event):
+        producto_elegido = self.listaDesplegableProductos.get()
+        codigo_producto = producto_elegido.split(" ->")[0]
+        VentaFrame.producto = None
+        # Buscamos el usuario por id, lo guardamos en la variable cliente
+        print("Codigo de producto: {}".format(codigo_producto))
+        VentaFrame.producto = MainFrame.controlador_producto.buscar_por_id(codigo_producto)
+
+        for item in self.tablaItemsProductos.get_children():
+
+            # Si coinciden los codigos de producto
+            if self.tablaItemsProductos.item(item)["text"] == VentaFrame.producto.codigo:
+                VentaFrame.producto.stock -= int(self.tablaItemsProductos.item(item)["values"][3])
+
+        # Insertamos el texto en el label de status
+        texto = '''Código Producto: {}
+        Marca: {}   Modelo: {}
+        Precio: $ {}    Stock: {}
+        '''.format(VentaFrame.producto.codigo, VentaFrame.producto.marca, VentaFrame.producto.modelo,
+                   VentaFrame.producto.precio, VentaFrame.producto.stock)
+        self.labelListaProductos.configure(text=texto)
+
+    def agregarProducto(self):
+        print("Producto: {}".format(VentaFrame.producto))
+
+        # Si hay un producto seleccionado, un cliente y un usuario
+        if VentaFrame.producto and VentaFrame.cliente and VentaFrame.usuario:
+            print("Producto Stock: {}".format(VentaFrame.producto.stock))
+
+            # stockdisponible = VentaFrame.producto.stock
+
+            # Si el stock del producto es mayor a 1
+            if VentaFrame.producto.stock >= 1:
+
+                # Pedimos al usuario ingrese la cantidad de productos a agregar
+
+                cantidad = simpledialog.askinteger("Cantidad",
+                                                   "Ingrese la cantidad de productos a agregar\nMin:01 - Max:{}".format(
+                                                       VentaFrame.producto.stock), minvalue=1,
+                                                   maxvalue=VentaFrame.producto.stock, parent=self)
+
+                # Validacion al apretar cancelar en el cuadro de dialogo
+                if cantidad is not None:
+
+                    # Si el producto ya esta en la lista, sumamos la cantidad
+                    for item in self.tablaItemsProductos.get_children():
+
+                        # Si coinciden los codigos de producto
+                        if self.tablaItemsProductos.item(item)["text"] == VentaFrame.producto.codigo:
+
+                            # Obtenemos la cantidad actual en la lista
+                            cantidad_actual = int(self.tablaItemsProductos.item(item)["values"][3])
+
+                            # cantidad_total = cantidad_actual + cantidad
+                            print(cantidad_actual)
+                            if cantidad <= VentaFrame.producto.stock:
+                                # Sumamos la cantidad actual con la nueva
+                                cantidad += cantidad_actual
+                                # Eliminamos el item de la tabla
+                                self.tablaItemsProductos.delete(item)
+                                break
+                            else:
+                                messagebox.showerror("Error", "No hay suficiente stock para esa cantidad", parent=self)
+                                return
+
+                                # Si la cantidad es válida, agregamos el producto a la tabla
+                    self.tablaItemsProductos.insert("", "end", text=VentaFrame.producto.codigo,
+                                                    values=(VentaFrame.producto.marca, VentaFrame.producto.modelo,
+                                                            VentaFrame.producto.precio, cantidad,
+                                                            VentaFrame.producto.precio * cantidad))
+
+                    # Restamos la cantidad de productos al stock del producto
+                    VentaFrame.producto.stock -= cantidad
+                    # TODO: en este punto se podria crear la tabla de ventas
+                    # Desabilitamos la lista de clientes
+                    self.listaCliente.configure(state="disabled")
+
+                    # Desabilitamos la lista de usuarios
+                    self.listaUsuario.configure(state="disabled")
+
+                    # Reseteamos la seleccion de la lista de productos
+                    self.listaDesplegableProductos.set("")
+
+                    # Reseteamos el label de la lista de productos
+                    self.labelListaProductos.configure(text="\n\n\n")
+
+                    # Reseteamos el producto seleccionado
+                    VentaFrame.producto = None
+
+                    # MainFrame.controlador_producto.actualizar(VentaFrame.producto)
+                    # Actualizamos la lista de productos
+
+                    # # Actualizamos el precio total de la venta
+                    self.actualizarPrecioTotal()
+                else:
+                    messagebox.showerror("Error", "Debe ingresar una cantidad válida", parent=self)
+            else:
+                messagebox.showerror("Error", "No hay stock disponible", parent=self)
+        else:
+            messagebox.showerror("Error", "Debe seleccionar un cliente, un usuario y un producto", parent=self)
+
+    def eliminarProducto(self):
+        # Obtenemos el item seleccionado
+        item_seleccionado = self.tablaItemsProductos.selection()
+
+        # Si hay un item seleccionado
+        if item_seleccionado:
+            # Obtenemos la cantidad del producto seleccionado
+            cantidad = int(self.tablaItemsProductos.item(item_seleccionado)["values"][3])
+
+            # Obtenemos el codigo del producto seleccionado
+            codigo_producto = self.tablaItemsProductos.item(item_seleccionado)["text"]
+
+            # Buscamos el producto por id, lo guardamos en la variable producto
+            # producto = MainFrame.controlador_producto.buscar_por_id(codigo_producto)
+
+            # Sumamos la cantidad de productos al stock del producto
+            # producto.stock += cantidad
+
+            # Actualizamos el producto
+            # MainFrame.controlador_producto.actualizar(producto)
+
+            # Eliminamos el item de la tabla
+            self.tablaItemsProductos.delete(item_seleccionado)
+
+            # Reseteamos el listado
+            self.listaDesplegableProductos.set("")
+
+            # Actualizamos el precio total de la venta
+            self.actualizarPrecioTotal()
+
+            # Si no hay items en la tabla
+            if not self.tablaItemsProductos.get_children():
+                # Habilitamos la lista de clientes
+                self.listaCliente.configure(state="normal")
+
+                # # Borramos el texto de status cliente
+                # self.labelStatusCliente.configure(text="")
+
+                # Habilitamos la lista de usuarios
+                self.listaUsuario.configure(state="normal")
+
+                # # Borramos el texto de status usuario
+                # self.labelStatusUsuario.configure(text="")
+
+
+        else:
+            messagebox.showerror("Error", "Debe seleccionar un producto de la lista", parent=self)
+
+    def cancelarVenta(self):
+        if messagebox.askyesno("Cancelar venta", "¿Está seguro que desea cancelar la venta?", parent=self):
+            self.destroy()
+            #
+            # # Eliminamos los items de la tabla
+            # self.tablaItemsProductos.delete(*self.tablaItemsProductos.get_children())
+            #
+            # # Habilitamos la lista de clientes
+            # self.listaCliente.configure(state="normal")
+            #
+            # # Borramos el texto de status cliente
+            # self.labelStatusCliente.configure(text="")
+            #
+            # # Habilitamos la lista de usuarios
+            # self.listaUsuario.configure(state="normal")
+            #
+            # # Borramos el texto de status usuario
+            # self.labelStatusUsuario.configure(text="")
+            #
+            # VentaFrame.cliente = None
+            # VentaFrame.usuario = None
+            #
+            # # Reseteamos la seleccion de la lista de productos
+            # self.listaDesplegableProductos.set("")
+            #
+            # # Reseteamos el label de la lista de productos
+            # self.labelListaProductos.configure(text="\n\n\n")
+            #
+            # # Reseteamos el producto seleccionado
+            # VentaFrame.producto = None
+            #
+            # # Actualizamos el precio total de la venta
+            # self.actualizarPrecioTotal()
+
+    def actualizarPrecioTotal(self):
+        # Obtenemos los items de la tabla
+        items = self.tablaItemsProductos.get_children()
+        descuento = float(VentaFrame.cliente.descuento)
+        print("Descuento: ", descuento)
+        # Inicializamos el precio total
+        precio_total = 0
+
+        # Recorremos los items de la tabla
+        for item in items:
+            # Obtenemos el precio total del producto
+            precio_total += float(self.tablaItemsProductos.item(item)["values"][4])
+        precio_final = precio_total - precio_total * descuento / 100
+        # Actualizamos el label de precio total de la venta y lo mostramos tambien con descuento
+        self.labelTotalVenta.configure(text="Monto total: $ " + str(precio_total) + " - Descuento: $ " + str(
+            precio_total * descuento / 100) + " = $ " + str(precio_final))
+
+        # self.labelTotalVenta.configure(text="Monto total: $ " + str(precio_total))
+
+    def finalizarVenta(self):
+        # Creamos un with para manejar la transaccion
+
+        listado_items_para_insert = []
+        listado_items_para_update = []
+
+        # if VentaFrame.producto is None:
+        #     messagebox.showerror("Error", "Debe seleccionar un producto", parent=self)
+        #     return
+        if VentaFrame.cliente is None:
+            messagebox.showerror("Error", "Debe seleccionar un cliente", parent=self)
+            return
+        if VentaFrame.usuario is None:
+            messagebox.showerror("Error", "Debe seleccionar un usuario", parent=self)
+            return
+        # Verifica que existan items en la tabla
+        if not self.tablaItemsProductos.get_children():
+            messagebox.showerror("Error", "Debe agregar al menos un producto", parent=self)
+            return
+
+        try:
+            # Creamos el objeto venta
+            venta: Venta = Venta(cliente=VentaFrame.cliente, usuario=VentaFrame.usuario)
+
+            MainFrame.controlador_ventas.guardar(venta)
+            venta.codigo = MainFrame.controlador_ventas.id_ultima_venta()
+            print("Id ultima venta:")
+            print(MainFrame.controlador_ventas.id_ultima_venta())
+
+            # recorremos los items de la tabla para crear una lista de venta items
+            for item in self.tablaItemsProductos.get_children():
+                # Obtenemos el codigo del producto
+                codigo_producto = self.tablaItemsProductos.item(item)["text"]
+                producto: Producto = MainFrame.controlador_producto.buscar_por_id(codigo_producto)
+
+                # Obtenemos la cantidad del producto
+                cantidad = int(self.tablaItemsProductos.item(item)["values"][3])
+
+                # Obtenemos el precio del producto
+                precio = float(self.tablaItemsProductos.item(item)["values"][2])
+
+                # Creamos el objeto venta item
+                item = VentaItem(venta, producto, cantidad=cantidad)
+
+                listado_items_para_update.append(item)
+                # listado_items_para_insert.append(item)
+
+                # Agregamos una lista de valores de venta items al listado para ejecutar el insert
+                listado_items_para_insert.append(
+                    [item.id_venta, item.id_producto, item.cantidad, item.precio_unitario])
+
+            MainFrame.controlador_ventas_items.guardar_varios(listado_items_para_insert)
+            monto_final = 0
+            # Recorremos la lista de items para actualizar el stock
+            for item in listado_items_para_update:
+                # monto final de la venta
+                monto_final += float(item.cantidad) * float(item.precio_unitario)
+                # calculamos el nuevo stock
+                nuevo_stock = item.producto.stock - item.cantidad
+                # actualizamos el stock del producto
+                item.producto.stock = nuevo_stock
+                # actualizamos el producto en la base de datos
+                MainFrame.controlador_producto.actualizar(item.producto)
+
+            # Actualizamos la comision del usuario sobre el monto final
+            VentaFrame.usuario.comision += monto_final * float(VentaFrame.usuario.porcentualcomision) / 100
+            # Actualizamos el usuario en la base de datos
+            MainFrame.controlador_usuario.actualizar(VentaFrame.usuario)
+            venta.importe = monto_final
+            venta.comision = float(monto_final) * float(VentaFrame.usuario.porcentualcomision) / 100
+            venta.descuento = float(monto_final) * float(VentaFrame.cliente.descuento) / 100
+            MainFrame.controlador_ventas.actualizar(venta)
+            messagebox.showinfo("Venta", "Venta realizada con éxito", parent=self)
+            self.destroy()
+
+        except Exception as e:
+            messagebox.showerror("Error", "No se pudo guardar la venta", parent=self)
+            print(e)
+            return
+
+            # Creamos el objeto venta item
+
+            # Agregamos el objeto venta item a la lista de venta items
+            # VentaFrame.ventaItem.append(venta_item)
+
+        # Actualiza el producto en la base de datos
+        # MainFrame.controlador_producto.actualizar(producto)
+
+        # Actualiza la tabla
+        # self.listar_productos()
