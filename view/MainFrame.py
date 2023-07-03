@@ -1491,3 +1491,136 @@ class UsuarioFrame(ctk.CTkToplevel):
                 return False
         # Si pasó todas las validaciones, devuelve True
         return True
+
+
+###############################################################
+# Clase principal de la aplicación
+class MainFrame(ctk.CTk):
+    # Crea la base de datos y las tablas si no existen
+    if not ConnectionFactory().chequearDB():
+        ConnectionFactory().crear_tablas()
+
+    # Configura la apariencia de la ventana
+    ctk.set_appearance_mode("light")
+
+    # Configura el tema de colores
+    ctk.set_default_color_theme("blue")
+
+    # Crea el controlador de productos
+    controlador_producto = ProductoController()
+
+    # Crea el controlador de usuarios
+    controlador_usuario = UsuarioController()
+
+    # Crea el controlador de clientes
+    controlador_cliente = ClienteController()
+
+    # Crea el controlador de ventas
+    controlador_ventas = VentaController()
+
+    # Crea el controlador de items de venta
+    controlador_ventas_items = VentaItemController()
+
+    # Crea ventana principal
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Configura la ventana
+        self.geometry("500x500")
+
+        # Agrega un título a la ventana
+        self.title("Sistema de Ventas - Grupo: UTN Bs As")
+
+        # Agrega boton para abrir la ventana de productos
+        self.buttonProductos = ctk.CTkButton(self,
+                                             text="Gestión de Productos",
+                                             command=self.abrir_productos,
+                                             height=90
+                                             )
+        self.buttonProductos.pack(anchor="center", padx=5, pady=5, fill="both")
+
+        # Agrega boton para abrir la ventana de usuarios
+        self.buttonUsuarios = ctk.CTkButton(self,
+                                            text="Gestión de Usuarios",
+                                            command=self.abrir_usuarios,
+                                            height=90
+                                            )
+        self.buttonUsuarios.pack(anchor="center", padx=5, pady=5, fill="both")
+
+        # Agrega boton para abrir la ventana de clientes
+        self.buttonClientes = ctk.CTkButton(self,
+                                            text="Gestión de Clientes",
+                                            command=self.abrir_clientes,
+                                            height=90
+                                            )
+        self.buttonClientes.pack(anchor="center", padx=5, pady=5, fill="both")
+
+        # Agrega boton para abrir la ventana de ventas
+        self.buttonVentas = ctk.CTkButton(self,
+                                          text="Realizar una Venta",
+                                          command=self.abrir_ventas,
+                                          height=90
+                                          )
+        self.buttonVentas.pack(anchor="center", padx=5, pady=5, fill="both")
+
+        self.buttonListadoVentas = ctk.CTkButton(self,
+                                                 text="Listado de Ventas",
+                                                 # command=self.abrir_listado_ventas,
+                                                 height=90
+                                                 )
+        self.buttonListadoVentas.pack(anchor="center", padx=5, pady=5, fill="both")
+
+        # Setea la ventana de productos como None para controlar si existe
+        self.ventanaProductos = None
+
+        # Setea la ventana de usuarios como None para controlar si existe
+        self.ventanaUsuarios = None
+
+        # Setea la ventana de clientes como None para controlar si existe
+        self.ventanaClientes = None
+
+        # Setea la ventana de ventas como None para controlar si existe
+        self.ventanaVentas = None
+
+    # Abre la ventana de productos
+    def abrir_productos(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaProductos is None or not self.ventanaProductos.winfo_exists():
+            # Crea la ventana de productos
+            self.ventanaProductos = ProductoFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaProductos.focus()
+
+    def abrir_usuarios(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaUsuarios is None or not self.ventanaUsuarios.winfo_exists():
+            # Crea la ventana de usuarios
+            self.ventanaUsuarios = UsuarioFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaUsuarios.focus()
+
+    def abrir_clientes(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaClientes is None or not self.ventanaClientes.winfo_exists():
+            # Crea la ventana de clientes
+            self.ventanaClientes = ClienteFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaClientes.focus()
+
+    def abrir_ventas(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaVentas is None or not self.ventanaVentas.winfo_exists():
+            # Crea la ventana de ventas
+            self.ventanaVentas = VentaFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaVentas.deiconify()
+            # self.ventanaVentas.focus()
+
+
+###############################################################
+# Crea la ventana principal
+app = MainFrame()
