@@ -11,6 +11,9 @@ class VentaItem:
         self._id_producto = producto.codigo
         self._cantidad = cantidad
         self._precio_unitario = producto.precio
+        self._producto = producto
+        self._venta = venta
+        self._id_usuario = venta.id_usuario
 
     @property
     def codigo(self):
@@ -52,5 +55,21 @@ class VentaItem:
     def precio_unitario(self, precio_unitario):
         self._precio_unitario = precio_unitario
 
+    @property
+    def producto(self):
+        return self._producto
+
+    @producto.setter
+    def producto(self, producto):
+        self._producto = producto
+
+    @property
+    def venta(self):
+        return self._venta
+
+    @venta.setter
+    def venta(self, venta):
+        self._venta = venta
+
     def __str__(self):
-        return f'{self._codigo} {self._id_venta} {self._id_producto} {self._cantidad} {self._precio_unitario}'
+        return f'{self._id_venta},{self._id_producto} {self._cantidad} {self._precio_unitario}'

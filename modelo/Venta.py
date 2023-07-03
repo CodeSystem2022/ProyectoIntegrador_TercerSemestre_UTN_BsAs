@@ -1,27 +1,29 @@
 from datetime import datetime
 
 from modelo.Cliente import Cliente
-from modelo.Producto import Producto
 from modelo.Usuario import Usuario
 
 
 class Venta:
     lista_ventas: list = []
 
-    def __init__(self, usuario: Usuario, cliente: Cliente, codigo=0, importe=0, comision=0, descuento=0):
+    def __init__(self, usuario: Usuario, cliente: Cliente, codigo=0, importe=0):
         self._codigo = codigo
         self._fecha_alta = datetime.now()
-        self._usuario = usuario
-        self._cliente = cliente
+        self._id_usuario = usuario.codigo
+        self._id_cliente = cliente.codigo
         self._importe = importe
-        self._comision = comision
-        self._descuento = descuento
-        self._productos: dict = {}
+        self._comision = usuario.comision
+        self._descuento = cliente.descuento
         Venta.lista_ventas.append(self)
 
     @property
     def codigo(self):
         return self._codigo
+
+    @codigo.setter
+    def codigo(self, codigo):
+        self._codigo = codigo
 
     @property
     def fecha_alta(self):
@@ -32,20 +34,20 @@ class Venta:
         self._fecha_alta = fecha_alta
 
     @property
-    def usuario(self):
-        return self._usuario
+    def id_usuario(self):
+        return self._id_usuario
 
-    @usuario.setter
-    def usuario(self, usuario):
-        self._usuario = usuario
+    @id_usuario.setter
+    def id_usuario(self, id_usuario):
+        self._id_usuario = id_usuario
 
     @property
-    def cliente(self):
-        return self._cliente
+    def id_cliente(self):
+        return self._id_cliente
 
-    @cliente.setter
-    def cliente(self, cliente):
-        self._cliente = cliente
+    @id_cliente.setter
+    def id_cliente(self, id_cliente):
+        self._id_cliente = id_cliente
 
     @property
     def importe(self):
@@ -70,8 +72,8 @@ class Venta:
     @descuento.setter
     def descuento(self, descuento):
         self._descuento = descuento
-        
-    def agregar_producto(self, producto: Producto, cantidad: int):
+
+    def agregar_producto(self, producto: Usuario, cantidad: int):
         if producto.stock < cantidad:
             print(f'No hay stock suficiente de {producto.marca}')
             return
@@ -90,40 +92,14 @@ class Venta:
         total: float = 0
         for producto, cantidad in self._productos.items():
             total += producto.precio * cantidad
-        total *= (1 - self._cliente.descuento)
-        self._usuario.comisionar_venta(total)
+        total *= (1 - self._id_cliente.descuento)
+        self._id_usuario.comisionar_venta(total)
         print(f'Venta confirmada por ${total}')
 
     def listar_productos(self):
         print(f'Listando ({len(self._productos)}) productos en Pedido No {self._codigo}...')
         for producto, cantidad in self._productos.items():
-            print(f'{producto.marca} x {cantidad}')
+            print(f'{producto.entryNombre} x {cantidad}')
 
     def __str__(self):
-        return f'Pedido:\n' \
-               f'\tCódigo: {self._codigo}\n' \
-               f'\t{self._usuario}\n' \
-               f'\tCliente: {self._cliente}\n' \
-               f'\tProductos: {self.listar_productos()}\n'
-
-
-if __name__ == '__main__':
-    producto1: Producto = Producto(1, 'Botella Coca Cola 2 Lts', 350, 50)
-    producto2: Producto = Producto(2, 'Botella Pepsi 2 Lts', 300, 50)
-
-    cliente1: Cliente = Cliente('Juan', 'Calle Falsa 123', 1, 0.15)
-    cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
-
-    vendedor1: Usuario = Usuario('Lucas', 'Francia 231', 1, 0, 0.10)
-
-    pedido1: Venta = Venta(vendedor1, cliente1)
-    pedido1.agregar_producto(producto1, 2)
-    pedido1.agregar_producto(producto1, 4)
-    pedido1.agregar_producto(producto2, 10)
-
-    # pedido1.listar_productos()
-    pedido1.confirmar_venta()
-    pedido1.listar_productos()
-    print(producto1)
-    print(producto2)
-    print(vendedor1)
+        return f'Venta: {self._codigo} - {self._fecha_alta} - Cliente: {self._id_cliente} - Usuario: {self._id_usuario} - Importe: ${self._importe} - Comisión: {self._comision} - Descuento: {self._descuento}'

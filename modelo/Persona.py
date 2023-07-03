@@ -32,4 +32,3 @@ class Persona:
         return f'\tNombre: {self._nombre} \n ' \
                f'\tApellido: {self._apellido} \n ' \
                f'\tDocumento: {self._documento}'
-

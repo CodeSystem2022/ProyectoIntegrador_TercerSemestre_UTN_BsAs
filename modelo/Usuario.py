@@ -5,12 +5,6 @@ class Usuario(Persona):
     # Lista para almacenar vendedores creados
     lista_usuarios: list = []
 
-    @classmethod
-    def listar_usuarios(cls):
-        print(f'Listando ({len(cls.lista_usuarios)}) usuarios...')
-        for usuario in cls.lista_usuarios:
-            print(usuario)
-
     def __init__(self, nombre, apellido, documento, porcentualcomision, comision=0, codigo=0):
         super().__init__(nombre, apellido, documento)
         self._codigo = codigo
@@ -36,10 +30,7 @@ class Usuario(Persona):
 
     @porcentualcomision.setter
     def porcentualcomision(self, porcentaje):
-        if 0 < porcentaje <= 1:
-            self._porcentualcomision = porcentaje
-        else:
-            print('ERROR! El valor debe estar expresado en decimales (Ej: 0.1 para 10%)')
+        self._porcentualcomision = porcentaje
 
     def __str__(self):
         return f'Usuario:\n' \
@@ -54,12 +45,3 @@ class Usuario(Persona):
     # TODO: Falta código para generar ventas, conectando la orden con el producto
     def generar_venta(self):
         pass
-
-
-if __name__ == '__main__':
-    vendedor1: Usuario = Usuario('Lucas', 'Apellido', '33333333', 0.10)
-    print(vendedor1)
-    vendedor1.comisionar_venta(1000)
-    vendedor1.comisionar_venta(500)
-    print(vendedor1)
-    Usuario.listar_usuarios()

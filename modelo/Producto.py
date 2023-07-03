@@ -1,7 +1,5 @@
-
-
 class Producto:
-    
+    # Almacenamos objetos tipo Producto en una lista
     lista_productos = []
 
     def __init__(self, marca, modelo, precio, stock, codigo=0):
@@ -10,11 +8,10 @@ class Producto:
         self._modelo = modelo
         self._precio = precio
         self._stock = stock
-       
+        # Agregamos el objeto a la lista de productos
         Producto.lista_productos.append(self)
 
     @property
-
     def codigo(self):
         return self._codigo
 
@@ -55,20 +52,4 @@ class Producto:
         self._stock = stock
 
     def __str__(self):
-        return f'Producto:\n' \
-               f'\tCódigo: {self._codigo} \n' \
-               f'\tMarca: {self._marca}\n' \
-               f'\tModelo: {self._modelo}\n' \
-               f'\tPrecio: ${self._precio}\n' \
-               f'\tStock: {self._stock} unidades\n'
-
-    @classmethod
-    def listar_productos(cls):
-        print(f'Listando ({len(cls.lista_productos)}) productos...')
-        for producto in cls.lista_productos:
-            print(producto)
-
-
-if __name__ == '__main__':
-    
-    Producto.listar_productos()
+        return '{} -> {} {} [ ${} ]'.format(self._codigo, self._marca, self._modelo, self._precio)

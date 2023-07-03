@@ -36,10 +36,7 @@ class Cliente(Persona):
 
     @descuento.setter
     def descuento(self, descuento):
-        if 0 < descuento <= 1:
-            self._descuento = descuento
-        else:
-            print('ERROR! El valor debe estar expresado en decimales (Ej: 0.1 para 10%)')
+        self._descuento = descuento
 
     def __str__(self):
         return f'Cliente:\n' \
@@ -47,63 +44,3 @@ class Cliente(Persona):
                f'\tCódigo: {self._codigo} \n ' \
                f'\tEmail: {self._email} \n ' \
                f'\tDescuento: {self._descuento * 100}%'
-
-
-if __name__ == '__main__':
-    cliente1: Cliente = Cliente('Juan', 'Garay', 'Calle Falsa 123', 1, 0.15)
-    cliente2: Cliente = Cliente('Maria', 'Charlone 456', 2, 0.10)
-    # print(cliente1)
-    # print(cliente2)
-    Cliente.listar_clientes()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
