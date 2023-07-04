@@ -7,14 +7,14 @@ from modelo.Usuario import Usuario
 class Venta:
     lista_ventas: list = []
 
-    def __init__(self, usuario: Usuario, cliente: Cliente, codigo=0, importe=0):
+    def __init__(self, usuario: Usuario, cliente: Cliente, id_cliente=0 ,id_usuario = 0,descuento = 0, comision=0, codigo=0, importe=0, fecha_alta=datetime.now()):
         self._codigo = codigo
-        self._fecha_alta = datetime.now()
-        self._id_usuario = usuario.codigo
-        self._id_cliente = cliente.codigo
+        self._fecha_alta = fecha_alta
+        self._id_usuario = usuario.codigo if usuario else id_usuario
+        self._id_cliente = cliente.codigo if cliente else id_cliente
         self._importe = importe
-        self._comision = usuario.comision
-        self._descuento = cliente.descuento
+        self._comision = usuario.comision if usuario else comision
+        self._descuento = cliente.descuento if cliente else descuento
         Venta.lista_ventas.append(self)
 
     @property

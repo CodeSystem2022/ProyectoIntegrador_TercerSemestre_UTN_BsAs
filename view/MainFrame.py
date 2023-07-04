@@ -19,6 +19,85 @@ from modelo.VentaItem import VentaItem
 # Fuente
 # https://customtkinter.tomschimansky.com/documentation/windows/toplevel
 
+##############################################################
+# Clase para la ventana de listado de ventas
+class ListadoVentasFrame(ctk.CTkToplevel):
+    venta_seleccionada: Venta = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.focus_set()
+        self.grab_set()
+        # Dando tamaño a la ventana
+        self.geometry("650x500")
+
+        # Dando título a la ventana
+        self.title("Listado de ventas")
+
+        # Creamos un label para mostrar el listado
+        self.labelListadoVentas = ctk.CTkLabel(self, text="Listado de ventas", font=("Helvetica", 16))
+        self.labelListadoVentas.grid(column=0, row=0, columnspan=2, pady=10)
+        # Creamos un label para mostrar el usuario
+        self.labelUsuario = ctk.CTkLabel(self, text="Usuario:", font=("Helvetica", 12))
+        self.labelUsuario.grid(column=2, row=0, columnspan=2, pady=10)
+
+        # Creamos un label para mostrar el cliente
+        self.labelCliente = ctk.CTkLabel(self, text="Cliente:", font=("Helvetica", 12))
+        self.labelCliente.grid(column=2, row=1, columnspan=2, pady=10)
+
+        # Creamos un listbox para mostrar las ventas
+        self.listaVentas = tkinter.Listbox(self, width=50, height=4)
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarListadoVentas = tkinter.Scrollbar(self, orient="vertical", borderwidth=0)
+        self.listaVentas.config(yscrollcommand=self.scrollbarListadoVentas.set)
+        self.scrollbarListadoVentas.config(command=self.listaVentas.yview)
+        self.scrollbarListadoVentas.grid(sticky="N"
+                                                "SE", column=2, row= 1, rowspan=2)
+
+        # Insertamos los clientes en la lista, contador_cliente es para el indice de la lista
+        contador_ventas = 0
+        for venta in MainFrame.controlador_ventas.listar():
+            contador_ventas += 1
+            self.listaVentas.insert(contador_ventas,
+                                     '({}) - $ {}'.format(venta.codigo, venta.importe))
+
+        # Agregamos un evento para cuando se seleccione un cliente
+        self.listaVentas.bind("<<ListboxSelect>>", self.OnSelectVenta)
+
+        # Insertamos la lista en el frame
+        self.listaVentas.grid(row=2, column=0,columnspan=2, sticky="we")
+
+
+    def OnSelectVenta(self, event):
+        seleccion = self.listaVentas.curselection()
+        if seleccion:
+            # VentaFrame.venta = None
+            # Obtenemos el índice del elemento seleccionado
+            index = self.listaVentas.curselection()[0]
+            # Obtenemos el texto del elemento seleccionado
+            venta_elegida = self.listaVentas.get(index)
+            # Separamos el codigo
+            codigo_venta = venta_elegida.split(")")[0].replace("(", "")
+            # Buscamos la venta por id, lo guardamos en la variable venta
+            listado_venta_item: list = MainFrame.controlador_ventas_items.buscar_por_id_venta(codigo_venta)
+
+            for venta_item in listado_venta_item:
+                print("Venta item: {}".format(venta_item))
+                producto = MainFrame.controlador_producto.buscar_por_id(venta_item.id_producto)
+                ListadoVentasFrame.venta_seleccionada = MainFrame.controlador_ventas.buscar_por_id(venta_item.id_venta)
+                print("Producto: {}".format(producto))
+                print("Cantidad: {}".format(venta_item.cantidad))
+                print("Precio: ${}".format(venta_item.precio_unitario))
+                print("Importe total producto: ${}".format(venta_item.cantidad * venta_item.precio_unitario))
+                print("Marca: {}".format(producto.marca))
+                print("Modelo: {}".format(producto.modelo))
+        print("Precio total: ${}".format(ListadoVentasFrame.venta_seleccionada.importe))
+            # Insertamos el texto en el label de status
+            # texto = 'Cliente: {} {} - Descuento: %{}'.format(VentaFrame.cliente.nombre, VentaFrame.cliente.apellido,
+            #                                                  VentaFrame.cliente.descuento)
+            # self.labelStatusCliente.configure(text=texto)
+
+
 ###############################################################
 # Clase para la ventana de gestión de productos
 class ProductoFrame(ctk.CTkToplevel):
@@ -327,6 +406,7 @@ class VentaFrame(ctk.CTkToplevel):
     usuario: Usuario = None
     cliente: Cliente = None
     producto: Producto = None
+    venta: Venta = None
 
     # TODO: se borra?
     producto_pedido: Producto = None
@@ -1576,7 +1656,7 @@ class MainFrame(ctk.CTk):
 
         self.buttonListadoVentas = ctk.CTkButton(self,
                                                  text="Listado de Ventas",
-                                                 # command=self.abrir_listado_ventas,
+                                                 command=self.abrir_listado_ventas,
                                                  height=90
                                                  )
         self.buttonListadoVentas.pack(anchor="center", padx=5, pady=5, fill="both")
@@ -1592,6 +1672,9 @@ class MainFrame(ctk.CTk):
 
         # Setea la ventana de ventas como None para controlar si existe
         self.ventanaVentas = None
+
+        # Setea la ventana de listado de ventas como None para controlar si existe
+        self.ventanaListadoVentas = None
 
     # Abre la ventana de productos
     def abrir_productos(self):
@@ -1629,6 +1712,17 @@ class MainFrame(ctk.CTk):
         else:
             # Si la ventana existe, la enfoca
             self.ventanaVentas.deiconify()
+            # self.ventanaVentas.focus()
+
+
+    def abrir_listado_ventas(self):
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaListadoVentas is None or not self.ventanaListadoVentas.winfo_exists():
+            # Crea la ventana de ventas
+            self.ventanaListadoVentas = ListadoVentasFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaListadoVentas.deiconify()
             # self.ventanaVentas.focus()
 
 

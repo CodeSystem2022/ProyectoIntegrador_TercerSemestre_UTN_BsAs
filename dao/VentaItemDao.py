@@ -7,21 +7,6 @@ class VentaItemDao:
     def __init__(self, con: ConnectionFactory):
         self.con = con
 
-    # Guardar un registro en la tabla ventas_items
-    def guardar(self, venta_item: VentaItem):
-        try:
-            with self.con as conexion:
-                with conexion.cursor() as cursor:
-                    prepared_statement = 'INSERT INTO ventas_items (id_venta, id_producto, cantidad, precio_unitario) VALUES (%s, %s, %s, %s)'
-                    cursor.execute(prepared_statement,
-                                   (venta_item.id_venta, venta_item.id_producto, venta_item.cantidad,
-                                    venta_item.precio_unitario))
-                    registros_insertados = cursor.rowcount
-                    print(f'Se ingresó satisfactoriamente {registros_insertados} registro(s).')
-                    print(venta_item)
-        except Exception as e:
-            print(f'Ocurrió un error: {e}')
-
     # Guardar varios registros
     def guardar_varios(self, venta_items: list):
         try:
@@ -54,31 +39,19 @@ class VentaItemDao:
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
-    def eliminar(self, venta: VentaItem):
+
+    def buscar_por_id_venta(self, id_venta):
+        listado_items: list = []
         try:
             with self.con as conexion:
                 with conexion.cursor() as cursor:
-                    prepared_statement = 'DELETE FROM ventas WHERE id_venta = %s'
-                    cursor.execute(prepared_statement, (venta.codigo,))
-                    registros_eliminados = cursor.rowcount
-                    print(f'Se eliminó satisfactoriamente {registros_eliminados} registro(s).')
+                    prepared_statement: str = 'SELECT * FROM ventas_items WHERE id_venta = %s'
+                    cursor.execute(prepared_statement, (id_venta,))
+                    registros = cursor.fetchall()
+                    for registro in registros:
+                        item = VentaItem(codigo=registro[0], id_venta=registro[1], id_producto=registro[2], cantidad=registro[3], precio_unitario=registro[4])
+                        listado_items.append(item)
+                    return listado_items
+
         except Exception as e:
             print(f'Ocurrió un error: {e}')
-
-    # Devuelve el último id ingresado
-    def ultimaVenta(self) -> VentaItem:
-        VentaItemDao.ultima_venta = None
-        try:
-            with self.con as conexion:
-                with conexion.cursor() as cursor:
-                    prepared_statement: str = 'SELECT max(id_venta) FROM ventas'
-                    cursor.execute(prepared_statement)
-                    registros = cursor.fetchone()
-                    if registros[0]:
-                        print(registros[0])
-                    else:
-                        print("No hay registros de ventas")
-        except Exception as e:
-            print(f'Ocurrió un error: {e}')
-
-        return VentaItemDao.ultima_venta
