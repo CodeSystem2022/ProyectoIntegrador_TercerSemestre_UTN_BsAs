@@ -19,6 +19,128 @@ from modelo.VentaItem import VentaItem
 # Fuente
 # https://customtkinter.tomschimansky.com/documentation/windows/toplevel
 
+##############################################################
+# Clase para la ventana de listado de ventas
+class ListadoVentasFrame(ctk.CTkToplevel):
+    venta_seleccionada: Venta = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.focus_set()
+        self.grab_set()
+        # Dando tamaño a la ventana
+        self.geometry("650x500")
+
+        # Dando título a la ventana
+        self.title("Listado de ventas")
+
+        # Creamos un label para mostrar el listado
+        self.labelListadoVentas = ctk.CTkLabel(self, text="Listado de ventas", text_color="#03396c",
+                                               font=("Helvetica", 16), width=650)
+        self.labelListadoVentas.grid(column=0, row=0, sticky="we", pady=10, columnspan=4)
+
+        # Creamos un label para mostrar el usuario
+        self.labelUsuario = ctk.CTkLabel(self, text="Usuario", text_color="#03396c", font=("Helvetica", 14),
+                                         anchor="center", width=300)
+        self.labelUsuario.grid(column=0, row=5, sticky="nswe")
+
+        # Creamos un label para mostrar detalle de usuario
+        self.labelDetalleUsuario = ctk.CTkLabel(self, text="\n\n\n\n", font=("Helvetica", 10), anchor="center",
+                                                width=300)
+        self.labelDetalleUsuario.grid(column=0, row=6, sticky="nswe", pady=5)
+
+        # Creamos un label para mostrar el cliente
+        self.labelCliente = ctk.CTkLabel(self, text="Cliente", text_color="#03396c", font=("Helvetica", 14),
+                                         anchor="center", width=300)
+        self.labelCliente.grid(column=2, row=5, sticky="nswe")
+
+        # Creamos un label para mostrar detalle de cliente
+        self.labelDetalleCliente = ctk.CTkLabel(self, text="\n\n\n\n", font=("Helvetica", 10), anchor="center",
+                                                width=300)
+        self.labelDetalleCliente.grid(column=2, row=6, sticky="nswe", pady=5)
+
+        # Creamos un listbox para mostrar las ventas
+        self.listaVentas = tkinter.Listbox(self, height=4, width=5)
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarListadoVentas = tkinter.Scrollbar(self, orient="vertical", borderwidth=0)
+        self.listaVentas.config(yscrollcommand=self.scrollbarListadoVentas.set)
+        self.scrollbarListadoVentas.config(command=self.listaVentas.yview)
+        self.scrollbarListadoVentas.grid(sticky="NSE", column=3, row=1, rowspan=2)
+
+        # Insertamos los clientes en la lista, contador_cliente es para el indice de la lista
+        contador_ventas = 0
+        for venta in MainFrame.controlador_ventas.listar():
+            contador_ventas += 1
+            self.listaVentas.insert(contador_ventas,
+                                    '({}) [{}] -> $ {}'.format(venta.codigo, venta.fecha_alta, venta.importe))
+
+        # Agregamos un evento para cuando se seleccione un cliente
+        self.listaVentas.bind("<<ListboxSelect>>", self.OnSelectVenta)
+
+        # Insertamos la lista en el frame
+        self.listaVentas.grid(row=1, column=0, columnspan=4, sticky="we")
+
+        # Creamos una lista para mostrar los productos de la venta
+        self.listaProductos = ttk.Treeview(self, columns=("Marca", "Modelo", "Precio", "Cantidad", "Subtotal"))
+
+        # heading: Texto de la cabecera de la columna
+        self.listaProductos.heading("#0", text="ID")
+        self.listaProductos.heading("Marca", text="Marca")
+        self.listaProductos.heading("Modelo", text="Modelo")
+        self.listaProductos.heading("Precio", text="Precio Unitario")
+        self.listaProductos.heading("Cantidad", text="Cantidad")
+        self.listaProductos.heading("Subtotal", text="Subtotal")
+
+        # column: Nombre de la columna
+        self.listaProductos.column("#0", width=55)
+        self.listaProductos.column("Marca", width=150)
+        self.listaProductos.column("Modelo", width=150)
+        self.listaProductos.column("Precio", width=90, anchor="center")
+        self.listaProductos.column("Cantidad", width=55, anchor="center")
+        self.listaProductos.column("Subtotal", width=90, anchor="center")
+
+        # Agregamos un scrollbar a la lista
+        self.scrollbarListaProductos = tkinter.Scrollbar(self, orient="vertical", borderwidth=0)
+        self.listaProductos.config(yscrollcommand=self.scrollbarListaProductos.set)
+        self.scrollbarListaProductos.config(command=self.listaProductos.yview)
+        self.scrollbarListaProductos.grid(sticky="NSE", column=3, row=7, rowspan=2)
+        self.listaProductos.grid(row=7, column=0, columnspan=4, sticky="wes")
+
+    def OnSelectVenta(self, event):
+        # Borramos la lista de productos
+        self.listaProductos.delete(*self.listaProductos.get_children())
+
+        seleccion = self.listaVentas.curselection()
+        if seleccion:
+            # Obtenemos el índice del elemento seleccionado
+            index = self.listaVentas.curselection()[0]
+            # Obtenemos el texto del elemento seleccionado
+            venta_elegida = self.listaVentas.get(index)
+            # Separamos el codigo
+            codigo_venta = venta_elegida.split(")")[0].replace("(", "")
+            # Buscamos la venta por id, lo guardamos en la variable venta
+            listado_venta_item: list = MainFrame.controlador_ventas_items.buscar_por_id_venta(codigo_venta)
+
+            for venta_item in listado_venta_item:
+                producto = MainFrame.controlador_producto.buscar_por_id(venta_item.id_producto)
+                ListadoVentasFrame.venta_seleccionada = MainFrame.controlador_ventas.buscar_por_id(venta_item.id_venta)
+                cliente = MainFrame.controlador_cliente.buscar_por_id(ListadoVentasFrame.venta_seleccionada.id_cliente)
+                usuario = MainFrame.controlador_usuario.buscar_por_id(ListadoVentasFrame.venta_seleccionada.id_usuario)
+
+                self.labelDetalleUsuario.configure(
+                    text="Nombre y Apellido: {} {}\n Documento: {}\n Porcentual de Comisión: %{} \nComisión Acumulada: ${}".format(
+                        usuario.nombre, usuario.apellido, usuario.documento, int(usuario.porcentualcomision),
+                        usuario.comision))
+                self.labelDetalleCliente.configure(
+                    text="Nombre y Apellido: {} {}\n Documento: {}\n Email: {} \nDescuento: %{}".format(
+                        cliente.nombre, cliente.apellido, cliente.documento, cliente.email,
+                        int(cliente.descuento)))
+                self.listaProductos.insert("", tkinter.END, text=producto.codigo, values=(
+                    producto.marca, producto.modelo, venta_item.precio_unitario, venta_item.cantidad,
+                    venta_item.cantidad * venta_item.precio_unitario))
+
+
 ###############################################################
 # Clase para la ventana de gestión de productos
 class ProductoFrame(ctk.CTkToplevel):
@@ -164,7 +286,6 @@ class ProductoFrame(ctk.CTkToplevel):
     def eliminar(self):
         # Si no hay nada seleccionado, no hace nada
         if self.tabla.focus() == "" or self.tabla.focus() is None:
-            print("No hay nada seleccionado")
             return
 
         if messagebox.askyesno("Eliminar", "¿Desea eliminar el producto seleccionado?", parent=self):
@@ -181,8 +302,6 @@ class ProductoFrame(ctk.CTkToplevel):
             precio = str(self.tabla.item(indice, "values")[2])
             # devuelve el valor de la columna 4 (Stock)
             stock = str(self.tabla.item(indice, "values")[3])
-
-            # print(id_producto)
 
             # Elimina el registro de la base de datos y
             # guarda en resultado la cantidad de registros eliminados
@@ -204,11 +323,9 @@ class ProductoFrame(ctk.CTkToplevel):
                 if "foreign key" in resultado:
                     # Muestra un mensaje de error
                     self.labelStatus.configure(
-                        text="No se puede eliminar el producto [{} - {}] porque tiene ventas asociadas".format(marca,
-                                                                                                               modelo),
+                        text="No se puede eliminar el producto [{} - {}] porque tiene ventas asociadas"
+                        .format(marca, modelo),
                         text_color="red")
-                    return
-                else:
                     return
 
     # Acciones al seleccionar una fila de la tabla
@@ -327,6 +444,7 @@ class VentaFrame(ctk.CTkToplevel):
     usuario: Usuario = None
     cliente: Cliente = None
     producto: Producto = None
+    venta: Venta = None
 
     # TODO: se borra?
     producto_pedido: Producto = None
@@ -787,7 +905,9 @@ class VentaFrame(ctk.CTkToplevel):
                 precio = float(self.tablaItemsProductos.item(item)["values"][2])
 
                 # Creamos el objeto venta item
-                item = VentaItem(venta, producto, cantidad=cantidad)
+                item = VentaItem(id_venta=venta.codigo, id_producto=producto.codigo, cantidad=cantidad,
+                                 producto=producto,
+                                 precio_unitario=producto.precio)
 
                 listado_items_para_update.append(item)
                 # listado_items_para_insert.append(item)
@@ -795,7 +915,9 @@ class VentaFrame(ctk.CTkToplevel):
                 # Agregamos una lista de valores de venta items al listado para ejecutar el insert
                 listado_items_para_insert.append(
                     [item.id_venta, item.id_producto, item.cantidad, item.precio_unitario])
+                print("Item: ", item)
 
+            print("Listado items para insert: ", listado_items_para_insert)
             MainFrame.controlador_ventas_items.guardar_varios(listado_items_para_insert)
             monto_final = 0
             # Recorremos la lista de items para actualizar el stock
@@ -1576,7 +1698,7 @@ class MainFrame(ctk.CTk):
 
         self.buttonListadoVentas = ctk.CTkButton(self,
                                                  text="Listado de Ventas",
-                                                 # command=self.abrir_listado_ventas,
+                                                 command=self.abrir_listado_ventas,
                                                  height=90
                                                  )
         self.buttonListadoVentas.pack(anchor="center", padx=5, pady=5, fill="both")
@@ -1592,6 +1714,9 @@ class MainFrame(ctk.CTk):
 
         # Setea la ventana de ventas como None para controlar si existe
         self.ventanaVentas = None
+
+        # Setea la ventana de listado de ventas como None para controlar si existe
+        self.ventanaListadoVentas = None
 
     # Abre la ventana de productos
     def abrir_productos(self):
@@ -1629,6 +1754,24 @@ class MainFrame(ctk.CTk):
         else:
             # Si la ventana existe, la enfoca
             self.ventanaVentas.deiconify()
+            # self.ventanaVentas.focus()
+
+    def abrir_listado_ventas(self):
+        # chequeamos que existan ventas realizadas
+        if self.controlador_ventas.listar():
+            print("Existen ventas realizadas")
+        else:
+            messagebox.showwarning("Error", "No existen ventas realizadas", parent=self)
+            print("No existen ventas realizadas")
+            return
+
+        # Si la ventana no existe o fue destruida, la crea
+        if self.ventanaListadoVentas is None or not self.ventanaListadoVentas.winfo_exists():
+            # Crea la ventana de ventas
+            self.ventanaListadoVentas = ListadoVentasFrame(self)
+        else:
+            # Si la ventana existe, la enfoca
+            self.ventanaListadoVentas.deiconify()
             # self.ventanaVentas.focus()
 
 

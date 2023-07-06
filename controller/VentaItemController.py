@@ -21,3 +21,6 @@ class VentaItemController:
 
     def eliminar(self, venta_item: VentaItem):
         self.venta_item_dao.eliminar(venta_item)
+
+    def buscar_por_id_venta(self, id_venta: str):
+        return self.venta_item_dao.buscar_por_id_venta(id_venta)

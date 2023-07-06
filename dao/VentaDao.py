@@ -1,4 +1,6 @@
 from factory.ConnectionFactory import ConnectionFactory
+from modelo.Cliente import Cliente
+from modelo.Usuario import Usuario
 from modelo.Venta import Venta
 
 
@@ -35,12 +37,15 @@ class VentaDao:
                     registros = cursor.fetchall()
                     if registros:
                         for registro in registros:
-                            VentaDao.listado_ventas.append(
-                                Venta(marca=registro[1], modelo=registro[2], precio=registro[3], stock=registro[4],
-                                      codigo=registro[0]))
-                        for producto in VentaDao.listado_ventas:
-                            print(
-                                f'Producto: {producto.codigo} - {producto.entryNombre} - {producto.modelo} - ${producto.precio} - {producto.stock} unidades')
+                            print(registro)
+                            venta = Venta(fecha_alta=registro[1], usuario=None, cliente=None,
+                                          importe=registro[4], comision=registro[5], descuento=registro[6],
+                                          codigo=registro[0])
+                            venta.id_usuario = registro[3]
+                            venta.id_cliente = registro[2]
+                            VentaDao.listado_ventas.append(venta)
+
+                        return VentaDao.listado_ventas
         except Exception as e:
             print(f'Ocurrió un error: {e}')
 
@@ -90,5 +95,23 @@ class VentaDao:
                     # Se imprime la cantidad de registros actualizados
                     print(f'Se actualizó satisfactoriamente {registros_actualizados} registro(s).')
         # Se captura la excepción
+        except Exception as e:
+            print(f'Ocurrió un error: {e}')
+
+    def buscar_por_id(self, id_venta):
+        try:
+            with self.con as conexion:
+                with conexion.cursor() as cursor:
+                    prepared_statement = 'SELECT * FROM ventas WHERE id_venta = %s'
+                    cursor.execute(prepared_statement, (id_venta,))
+                    registro = cursor.fetchone()
+                    if registro:
+                        print(registro)
+                        venta = Venta(fecha_alta=registro[1], id_cliente=registro[2], id_usuario=registro[3], usuario=None,
+                              cliente=None, importe=registro[4], comision=registro[5], descuento=registro[6],
+                              codigo=registro[0])
+                        return venta
+
+                    # crear la venta
         except Exception as e:
             print(f'Ocurrió un error: {e}')

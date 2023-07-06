@@ -5,15 +5,15 @@ from modelo.Venta import Venta
 class VentaItem:
     lista_ventas_items: list = []
 
-    def __init__(self, venta: Venta, producto: Producto, cantidad, codigo=0):
+    def __init__(self, cantidad, venta: Venta = None, producto: Producto = None, codigo=0, id_venta=0, id_producto=0, precio_unitario=0):
         self._codigo = codigo
-        self._id_venta = venta.codigo
-        self._id_producto = producto.codigo
+        self._id_venta = venta.codigo if venta else id_venta
+        self._id_producto = producto.codigo if producto else id_producto
         self._cantidad = cantidad
-        self._precio_unitario = producto.precio
+        self._precio_unitario = producto.precio if producto else precio_unitario
         self._producto = producto
         self._venta = venta
-        self._id_usuario = venta.id_usuario
+        self._id_usuario = venta.id_usuario if venta else None
 
     @property
     def codigo(self):
